@@ -16,16 +16,16 @@
 
 function calculateLeftoverBlocks(numBlocks) {
   let curLayer = 1;
-  let numRemaining = numBlocks;
+  let blocksRemaining = numBlocks;
   let blocksNeeded = curLayer ** 2;
 
-  while (blocksNeeded <= numRemaining) {
-    numRemaining -= blocksNeeded;
+  while (blocksNeeded <= blocksRemaining) {
+    blocksRemaining -= blocksNeeded;
     curLayer += 1;
     blocksNeeded = curLayer ** 2;
   }
 
-  return numRemaining;
+  return blocksRemaining;
 }
 
 
