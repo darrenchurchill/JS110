@@ -26,17 +26,14 @@ function sortStringsByConsonants(strings) {
 
 
 function* adjacentConsonants(string) {
+  string = string.split(' ').join('');
+
   let curIdx = 0;
   let nxtIdx = 1;
 
   while (nxtIdx < string.length) {
     let curChar = string[curIdx];
     let nxtChar = string[nxtIdx];
-
-    if (nxtChar === ' ') {
-      nxtIdx += 1;
-      continue;
-    }
 
     if (isConsonant(curChar) && isConsonant(nxtChar)) {
       yield [curChar, nxtChar];
