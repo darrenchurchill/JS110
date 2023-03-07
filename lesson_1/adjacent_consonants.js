@@ -25,10 +25,7 @@ function sortStringsByConsonants(strings) {
 }
 
 
-function countMaxAdjacentConsonants(string) {
-  let maxCount = 0;
-  let curCount = 0;
-
+function* adjacentConsonants(string) {
   let curIdx = 0;
   let nxtIdx = 1;
 
@@ -38,19 +35,27 @@ function countMaxAdjacentConsonants(string) {
 
     if (nxtChar === ' ') {
       nxtIdx += 1;
-    } else if (isConsonant(curChar) && isConsonant(nxtChar)) {
-      curCount = curCount === 0 ? 2 : curCount + 1;
-      curIdx += 1;
-      nxtIdx += 1;
-    } else {
-      if (curCount > maxCount) maxCount = curCount;
-      curCount = 0;
-      curIdx = nxtIdx + 1;
-      nxtIdx = curIdx + 1;
+      continue;
     }
-  }
 
-  if (curCount > maxCount) maxCount = curCount;
+    if (isConsonant(curChar) && isConsonant(nxtChar)) {
+      yield [curChar, nxtChar];
+    }
+
+    curIdx = nxtIdx;
+    nxtIdx += 1;
+  }
+}
+
+
+function countMaxAdjacentConsonants(string) {
+  let maxCount = 0;
+  let curCount = 0;
+
+  for (let _ of adjacentConsonants(string)) {
+    curCount = curCount === 0 ? 2 : curCount + 1;
+    if (curCount > maxCount) maxCount = curCount;
+  }
 
   return maxCount;
 }
