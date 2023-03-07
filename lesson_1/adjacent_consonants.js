@@ -9,19 +9,12 @@
  */
 
 function sortStringsByConsonants(strings) {
-  let adjacentCounts = [];
-
-  for (let string of strings) {
-    adjacentCounts.push({
-      string: string,
-      numAdj: countMaxAdjacentConsonants(string)
-    });
-  }
+  let result = [...strings];
 
   // sort ascending order by adjacent counts
-  adjacentCounts.sort((a, b) => b.numAdj - a.numAdj);
-
-  return adjacentCounts.map((el) => el.string);
+  return result.sort(
+    (a, b) => countMaxAdjacentConsonants(b) - countMaxAdjacentConsonants(a)
+  );
 }
 
 
