@@ -16,7 +16,7 @@ let munsters = {
   Marilyn: { age: 23, gender: 'female' },
 };
 
-let totalAge = Object.entries(munsters).reduce((totalAge, [_, info]) => {
+let totalAge = Object.values(munsters).reduce((totalAge, info) => {
   if (info.gender === 'male') return totalAge + info.age;
   return totalAge;
 }, 0);
