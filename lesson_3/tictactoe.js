@@ -68,6 +68,13 @@ function getRowCol(squareNum) {
   return [row, col];
 }
 
+function getSquareNum(row, col) {
+  let squareNum = 1;
+  squareNum += row * NUM_COLS;
+  squareNum += col;
+  return squareNum;
+}
+
 function getSquare(board, row, col) {
   return board[row][col];
 }
@@ -133,6 +140,9 @@ function doUserTurn(board) {
 
 function doComputerTurn(board) {
   let [choiceRow, choiceCol] = getComputerSquareChoice(board);
+  displayOutput(
+    `Computer chooses square ${getSquareNum(choiceRow, choiceCol)}.`
+  );
   markBoard(board, choiceRow, choiceCol, 'O');
 }
 
