@@ -124,7 +124,7 @@ function markBoard(board, row, col, mark) {
   board[row][col] = mark;
 }
 
-function getPlayerSquareChoice(board) {
+function promptPlayerSquareChoice(board) {
   while (true) {
     let choice = prompt(`Choose a square (1-${NUM_ROWS * NUM_COLS}):`);
     let [choiceRow, choiceCol] = getRowCol(choice);
@@ -152,7 +152,7 @@ function getComputerSquareChoice(board) {
 
 function doUserTurn(board) {
   displayBoard(board);
-  let [choiceRow, choiceCol] = getPlayerSquareChoice(board);
+  let [choiceRow, choiceCol] = promptPlayerSquareChoice(board);
   markBoard(board, choiceRow, choiceCol, 'X');
 }
 
