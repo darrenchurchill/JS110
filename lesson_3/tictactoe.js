@@ -25,21 +25,21 @@ function displayBoard(board) {
   });
 }
 
-function* genRows() {
+function* genRowNums() {
   for (let i = 0; i < NUM_ROWS; i++) {
     yield i;
   }
 }
 
-function* genCols() {
+function* genColNums() {
   for (let i = 0; i < NUM_COLS; i++) {
     yield i;
   }
 }
 
-function* genRowsCols() {
-  for (let row of genRows()) {
-    for (let col of genCols()) {
+function* genRowColNums() {
+  for (let row of genRowNums()) {
+    for (let col of genColNums()) {
       yield [row, col];
     }
   }
@@ -70,10 +70,10 @@ function* genDiagonalTopRightToBottomLeft() {
 function initializeBoard() {
   let board = [];
 
-  for (let row of genRows()) {
+  for (let row of genRowNums()) {
     board.push([]);
 
-    for (let _ of genCols()) {
+    for (let _ of genColNums()) {
       board[row].push(' ');
     }
   }
@@ -81,7 +81,7 @@ function initializeBoard() {
   return board;
 }
 
-function getRowCol(squareNum) {
+function getRowColNum(squareNum) {
   squareNum -= 1;
 
   let row = Math.floor(squareNum / NUM_COLS);
@@ -97,12 +97,12 @@ function getSquareNum(row, col) {
   return squareNum;
 }
 
-function getSquare(board, row, col) {
+function getSquareContents(board, row, col) {
   return board[row][col];
 }
 
 function isEmptySquare(board, row, col) {
-  return getSquare(board, row, col) === ' ';
+  return getSquareContents(board, row, col) === ' ';
 }
 
 function isInBounds(row, col) {
@@ -114,7 +114,7 @@ function isValidMove(board, row, col) {
 }
 
 function isBoardFull(board) {
-  for (let [row, col] of genRowsCols()) {
+  for (let [row, col] of genRowColNums()) {
     if (isEmptySquare(board, row, col)) return false;
   }
   return true;
@@ -127,7 +127,7 @@ function markBoard(board, row, col, mark) {
 function promptPlayerSquareChoice(board) {
   while (true) {
     let choice = prompt(`Choose a square (1-${NUM_ROWS * NUM_COLS}):`);
-    let [choiceRow, choiceCol] = getRowCol(choice);
+    let [choiceRow, choiceCol] = getRowColNum(choice);
 
     if (isValidMove(board, choiceRow, choiceCol)) return [choiceRow, choiceCol];
     displayOutput('That is an invalid choice. Choose again.');
@@ -137,7 +137,7 @@ function promptPlayerSquareChoice(board) {
 function getEmptySquares(board) {
   let result = [];
 
-  for (let [row, col] of genRowsCols()) {
+  for (let [row, col] of genRowColNums()) {
     if (isEmptySquare(board, row, col)) result.push([row, col]);
   }
 
@@ -171,35 +171,39 @@ function inspect(squares) {
 }
 
 function inspectRow(board, row) {
-  let squares = [...genCols()].map((col) => getSquare(board, row, col));
+  let squares = [...genColNums()].map((col) =>
+    getSquareContents(board, row, col)
+  );
   return inspect(squares);
 }
 
 function inspectCol(board, col) {
-  let squares = [...genRows()].map((row) => getSquare(board, row, col));
+  let squares = [...genRowNums()].map((row) =>
+    getSquareContents(board, row, col)
+  );
   return inspect(squares);
 }
 
 function inspectDiagonals(board) {
   let squares = [...genDiagonalTopLeftToBottomRight()].map(
-    ([row, col]) => getSquare(board, row, col)
+    ([row, col]) => getSquareContents(board, row, col)
   );
   let result = inspect(squares);
   if (result) return result;
 
   squares = [...genDiagonalTopRightToBottomLeft()].map(
-    ([row, col]) => getSquare(board, row, col)
+    ([row, col]) => getSquareContents(board, row, col)
   );
   return inspect(squares);
 }
 
 function inspectForWinner(board) {
-  for (let row of genRows()) {
+  for (let row of genRowNums()) {
     let result = inspectRow(board, row);
     if (result) return result;
   }
 
-  for (let col of genCols()) {
+  for (let col of genColNums()) {
     let result = inspectCol(board, col);
     if (result) return result;
   }
