@@ -145,9 +145,9 @@ function getEmptySquares(board) {
 }
 
 function getComputerSquareChoice(board) {
-  let empty = getEmptySquares(board);
-  let choice = Math.floor(Math.random() * empty.length);
-  return empty[choice];
+  let options = getEmptySquares(board);
+  let choice = Math.floor(Math.random() * options.length);
+  return options[choice];
 }
 
 function doUserTurn(board) {
