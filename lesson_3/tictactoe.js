@@ -91,6 +91,10 @@ function isBoardFull(board) {
   return true;
 }
 
+function hasWinner(board) {
+  return false;
+}
+
 function markBoard(board, row, col, mark) {
   board[row][col] = mark;
 }
@@ -117,6 +121,10 @@ function playTicTacToe() {
     if (isBoardFull(board)) {
       displayOutput("It's a tie.");
       return;
+    }
+    if (hasWinner(board)) {
+      displayOutput('We have a winner');
+      // TODO: figure out who won
     }
   }
 }
