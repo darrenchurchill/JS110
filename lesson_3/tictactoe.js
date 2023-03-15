@@ -109,15 +109,48 @@ function getPlayerSquareChoice(board) {
   }
 }
 
+function getEmptySquares(board) {
+  let result = [];
+
+  for (let [row, col] of genRowsCols()) {
+    if (isEmptySquare(board, row, col)) result.push([row, col]);
+  }
+
+  return result;
+}
+
+function getComputerSquareChoice(board) {
+  let empty = getEmptySquares(board);
+  let choice = Math.floor(Math.random() * empty.length);
+  return empty[choice];
+}
+
+function doUserTurn(board) {
+  displayBoard(board);
+  let [choiceRow, choiceCol] = getPlayerSquareChoice(board);
+  markBoard(board, choiceRow, choiceCol, 'X');
+}
+
+function doComputerTurn(board) {
+  let [choiceRow, choiceCol] = getComputerSquareChoice(board);
+  markBoard(board, choiceRow, choiceCol, 'O');
+}
+
+// eslint-disable-next-line max-lines-per-function
 function playTicTacToe() {
   let board = initializeBoard();
+  const USER_TURN = 0;
+  const COMPUTER_TURN = 1;
+  let curTurn = USER_TURN;
 
   while (true) {
-    displayBoard(board);
-
-    let [choiceRow, choiceCol] = getPlayerSquareChoice(board);
-    markBoard(board, choiceRow, choiceCol, 'X');
-
+    if (curTurn === USER_TURN) {
+      doUserTurn(board);
+      curTurn = COMPUTER_TURN;
+    } else if (curTurn === COMPUTER_TURN) {
+      doComputerTurn(board);
+      curTurn = USER_TURN;
+    }
     if (isBoardFull(board)) {
       displayOutput("It's a tie.");
       return;
