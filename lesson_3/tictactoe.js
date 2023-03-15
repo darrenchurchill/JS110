@@ -45,6 +45,28 @@ function* genRowsCols() {
   }
 }
 
+function* genDiagonalTopLeftToBottomRight() {
+  let row = 0;
+  let col = 0;
+
+  while (row < NUM_ROWS && col < NUM_COLS) {
+    yield [row, col];
+    row += 1;
+    col += 1;
+  }
+}
+
+function* genDiagonalTopRightToBottomLeft() {
+  let row = 0;
+  let col = NUM_COLS - 1;
+
+  while (row < NUM_ROWS && col >= 0) {
+    yield [row, col];
+    row += 1;
+    col -= 1;
+  }
+}
+
 function initializeBoard() {
   let board = [];
 
@@ -98,10 +120,6 @@ function isBoardFull(board) {
   return true;
 }
 
-function hasWinner(board) {
-  return false;
-}
-
 function markBoard(board, row, col, mark) {
   board[row][col] = mark;
 }
@@ -146,7 +164,50 @@ function doComputerTurn(board) {
   markBoard(board, choiceRow, choiceCol, 'O');
 }
 
-// eslint-disable-next-line max-lines-per-function
+function inspect(squares) {
+  let first = squares[0];
+  if (first === ' ') return '';
+  return squares.every((square) => square === first) ? first : '';
+}
+
+function inspectRow(board, row) {
+  let squares = [...genCols()].map((col) => getSquare(board, row, col));
+  return inspect(squares);
+}
+
+function inspectCol(board, col) {
+  let squares = [...genRows()].map((row) => getSquare(board, row, col));
+  return inspect(squares);
+}
+
+function inspectDiagonals(board) {
+  let squares = [...genDiagonalTopLeftToBottomRight()].map(
+    ([row, col]) => getSquare(board, row, col)
+  );
+  let result = inspect(squares);
+  if (result) return result;
+
+  squares = [...genDiagonalTopRightToBottomLeft()].map(
+    ([row, col]) => getSquare(board, row, col)
+  );
+  return inspect(squares);
+}
+
+function inspectForWinner(board) {
+  for (let row of genRows()) {
+    let result = inspectRow(board, row);
+    if (result) return result;
+  }
+
+  for (let col of genCols()) {
+    let result = inspectCol(board, col);
+    if (result) return result;
+  }
+
+  return inspectDiagonals(board);
+}
+
+// eslint-disable-next-line max-lines-per-function, max-statements
 function playTicTacToe() {
   let board = initializeBoard();
   const USER_TURN = 0;
@@ -161,13 +222,19 @@ function playTicTacToe() {
       doComputerTurn(board);
       curTurn = USER_TURN;
     }
+
     if (isBoardFull(board)) {
       displayOutput("It's a tie.");
+      displayBoard(board);
       return;
     }
-    if (hasWinner(board)) {
-      displayOutput('We have a winner');
-      // TODO: figure out who won
+
+    let curResult = inspectForWinner(board);
+    if (curResult) {
+      displayOutput('We have a winner!!!');
+      displayBoard(board);
+      displayOutput(`${curResult} wins!!!`);
+      return;
     }
   }
 }
