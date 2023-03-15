@@ -227,17 +227,17 @@ function playTicTacToe() {
       curTurn = USER_TURN;
     }
 
-    if (isBoardFull(board)) {
-      displayOutput("It's a tie.");
-      displayBoard(board);
-      return;
-    }
-
     let curResult = inspectForWinner(board);
     if (curResult) {
       displayOutput('We have a winner!!!');
       displayBoard(board);
       displayOutput(`${curResult} wins!!!`);
+      return;
+    }
+
+    if (isBoardFull(board)) {
+      displayOutput("It's a tie.");
+      displayBoard(board);
       return;
     }
   }
