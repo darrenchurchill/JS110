@@ -105,9 +105,20 @@ function getPlayerSquareChoice(board) {
   }
 }
 
-let board = initializeBoard();
-displayBoard(board);
-let [choiceRow, choiceCol] = getPlayerSquareChoice(board);
-markBoard(board, choiceRow, choiceCol, 'X');
-displayBoard(board);
-console.log(isBoardFull(board));
+function playTicTacToe() {
+  let board = initializeBoard();
+
+  while (true) {
+    displayBoard(board);
+
+    let [choiceRow, choiceCol] = getPlayerSquareChoice(board);
+    markBoard(board, choiceRow, choiceCol, 'X');
+
+    if (isBoardFull(board)) {
+      displayOutput("It's a tie.");
+      return;
+    }
+  }
+}
+
+playTicTacToe();
