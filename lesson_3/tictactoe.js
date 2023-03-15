@@ -239,4 +239,16 @@ function playTicTacToe() {
   }
 }
 
-playTicTacToe();
+function shouldPlayAgain() {
+  let input = readline.question('Play Again? [yN] ');
+  return input.toLowerCase() === 'y';
+}
+
+function playRounds() {
+  while (true) {
+    playTicTacToe();
+    if (!shouldPlayAgain()) return;
+  }
+}
+
+playRounds();
