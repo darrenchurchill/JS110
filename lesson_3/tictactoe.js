@@ -241,14 +241,14 @@ function inspectCol(board, col) {
  * winner.
  */
 function inspectDiagonals(board) {
-  let squares = [...genDiagonalTopLeftToBottomRight()].map(
-    ([row, col]) => getSquareContents(board, row, col)
+  let squares = [...genDiagonalTopLeftToBottomRight()].map(([row, col]) =>
+    getSquareContents(board, row, col)
   );
   let result = inspect(squares);
   if (result) return result;
 
-  squares = [...genDiagonalTopRightToBottomLeft()].map(
-    ([row, col]) => getSquareContents(board, row, col)
+  squares = [...genDiagonalTopRightToBottomLeft()].map(([row, col]) =>
+    getSquareContents(board, row, col)
   );
   return inspect(squares);
 }
