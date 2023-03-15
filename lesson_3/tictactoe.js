@@ -68,27 +68,20 @@ function getRowCol(squareNum) {
   return [row, col];
 }
 
-function getSquare(board, squareNum) {
-  let [row, col] = getRowCol(squareNum);
-  debugger;
+function getSquare(board, row, col) {
   return board[row][col];
 }
 
-function isEmptySquare(board, squareNumOrRowNum, colNum) {
-  let square =
-    colNum === undefined
-      ? getSquare(board, squareNumOrRowNum)
-      : board[squareNumOrRowNum][colNum];
-
-  return square === ' ';
+function isEmptySquare(board, row, col) {
+  return getSquare(board, row, col) === ' ';
 }
 
-function isInBounds(squareNum) {
-  return squareNum > 0 && squareNum < NUM_ROWS * NUM_COLS;
+function isInBounds(row, col) {
+  return row >= 0 && row < NUM_ROWS && col >= 0 && col < NUM_COLS;
 }
 
-function isValidMove(board, squareNum) {
-  return isInBounds(squareNum) && isEmptySquare(board, squareNum);
+function isValidMove(board, row, col) {
+  return isInBounds(row, col) && isEmptySquare(board, row, col);
 }
 
 function isBoardFull(board) {
@@ -98,22 +91,23 @@ function isBoardFull(board) {
   return true;
 }
 
-function markBoard(board, squareNum, mark) {
-  let [row, col] = getRowCol(squareNum);
+function markBoard(board, row, col, mark) {
   board[row][col] = mark;
 }
 
 function getPlayerSquareChoice(board) {
   while (true) {
     let choice = prompt(`Choose a square (1-${NUM_ROWS * NUM_COLS}):`);
-    if (isValidMove(board, choice)) return choice;
+    let [choiceRow, choiceCol] = getRowCol(choice);
+
+    if (isValidMove(board, choiceRow, choiceCol)) return [choiceRow, choiceCol];
     displayOutput('That is an invalid choice. Choose again.');
   }
 }
 
 let board = initializeBoard();
 displayBoard(board);
-let choice = getPlayerSquareChoice(board);
-markBoard(board, choice, 'X');
+let [choiceRow, choiceCol] = getPlayerSquareChoice(board);
+markBoard(board, choiceRow, choiceCol, 'X');
 displayBoard(board);
 console.log(isBoardFull(board));
