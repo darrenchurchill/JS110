@@ -81,6 +81,12 @@ function initializeBoard() {
   return board;
 }
 
+/**
+ * Given a square number (ex: 1-9 for a 3x3 game), return the board row and
+ * column number.
+ * @param {*} squareNum The square number, in the user's representation
+ * @returns {Array<number>} An array containing the board row and column number
+ */
 function getRowColNum(squareNum) {
   squareNum -= 1;
 
@@ -90,6 +96,13 @@ function getRowColNum(squareNum) {
   return [row, col];
 }
 
+/**
+ * Given a row and column number, return the user-representation board square
+ * number (ex: 1-9 for a 3x3 game).
+ * @param {number} row the board row number
+ * @param {number} col the board column number
+ * @returns {number} the user-representation square number
+ */
 function getSquareNum(row, col) {
   let squareNum = 1;
   squareNum += row * NUM_COLS;
@@ -124,6 +137,12 @@ function markBoard(board, row, col, mark) {
   board[row][col] = mark;
 }
 
+/**
+ * Prompt the user for their next choice and validate their input, re-prompting
+ * if necessary.
+ * @param {Array<Array<string>>} board the current game board
+ * @returns {undefined}
+ */
 function promptPlayerSquareChoice(board) {
   while (true) {
     let choice = prompt(`Choose a square (1-${NUM_ROWS * NUM_COLS}):`);
@@ -134,6 +153,12 @@ function promptPlayerSquareChoice(board) {
   }
 }
 
+/**
+ * Return an array containing the `[row, col]` locations of empty squares on
+ * the game board. Returns an empty array if there are no empty squares.
+ * @param {Array<Array<string>>} board the current game board
+ * @returns {Array<Array<number>>} the `[row, col]` empty square locations
+ */
 function getEmptySquares(board) {
   let result = [];
 
@@ -144,6 +169,11 @@ function getEmptySquares(board) {
   return result;
 }
 
+/**
+ * Generate the computer's next game choice from the available empty squares.
+ * @param {Array<Array<string>>} board the current game board
+ * @returns {Array<Array<number>>} the `[row, col]` choice
+ */
 function getComputerSquareChoice(board) {
   let options = getEmptySquares(board);
   let choice = Math.floor(Math.random() * options.length);
@@ -164,12 +194,25 @@ function doComputerTurn(board) {
   markBoard(board, choiceRow, choiceCol, 'O');
 }
 
+/**
+ * Inspect an array of adjacent game board squares for a winner.
+ * @param {Array<string>} squares An array representing adjacent board squares
+ * @returns {string} The game winner's board character. `''` if there is no
+ * winner.
+ */
 function inspect(squares) {
   let first = squares[0];
   if (first === ' ') return '';
   return squares.every((square) => square === first) ? first : '';
 }
 
+/**
+ * Inspect a single game board column for a winner.
+ * @param {Array<Array<string>>} board the current game board
+ * @param {number} row The row number to inspect
+ * @returns {string} The game winner's board character. `''` if there is no
+ * winner.
+ */
 function inspectRow(board, row) {
   let squares = [...genColNums()].map((col) =>
     getSquareContents(board, row, col)
@@ -177,6 +220,13 @@ function inspectRow(board, row) {
   return inspect(squares);
 }
 
+/**
+ * Inspect a single game board column for a winner.
+ * @param {Array<Array<string>>} board the current game board
+ * @param {number} col The column number to inspect
+ * @returns {string} The game winner's board character. `''` if there is no
+ * winner.
+ */
 function inspectCol(board, col) {
   let squares = [...genRowNums()].map((row) =>
     getSquareContents(board, row, col)
@@ -184,6 +234,12 @@ function inspectCol(board, col) {
   return inspect(squares);
 }
 
+/**
+ * Inspect the game board diagonals for a winner.
+ * @param {Array<Array<string>>} board the current game board
+ * @returns {string} The game winner's board character. `''` if there is no
+ * winner.
+ */
 function inspectDiagonals(board) {
   let squares = [...genDiagonalTopLeftToBottomRight()].map(
     ([row, col]) => getSquareContents(board, row, col)
@@ -197,6 +253,12 @@ function inspectDiagonals(board) {
   return inspect(squares);
 }
 
+/**
+ * Inspect the game board for a winner.
+ * @param {Array<Array<string>>} board the current game board
+ * @returns {string} The game winner's board character. `''` if there is no
+ * winner.
+ */
 function inspectForWinner(board) {
   for (let row of genRowNums()) {
     let result = inspectRow(board, row);
