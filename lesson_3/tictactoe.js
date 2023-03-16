@@ -130,6 +130,23 @@ function markBoard(board, idx, mark) {
 }
 
 /**
+ * Return an array's string representation, joining elements with the delimiter
+ * string, and inserting the lastWord before the final element.
+ * @param {Array} array the array of elements
+ * @param {string} delimiter the delimiter string
+ * @param {string} lastWord the last word to insert (ex: `'or'` or `'and'`)
+ * @returns {string} the joined string
+ */
+function joinOr(array, delimiter = ', ', lastWord = 'or') {
+  if (array.length <= 1) return `${array.join(delimiter)}`;
+
+  let firstSlice = array.slice(0, array.length - 1).join(delimiter);
+  let lastElem = array[array.length - 1];
+
+  return `${firstSlice}${delimiter}${lastWord ? `${lastWord} ` : ''}${lastElem}`;
+}
+
+/**
  * Prompt the user for their next choice and validate their input, re-prompting
  * if necessary.
  * @param {Array<string>} board the current game board
@@ -137,9 +154,9 @@ function markBoard(board, idx, mark) {
  */
 function promptPlayerSquareChoice(board) {
   while (true) {
-    let choices = getEmptySquareIndexes(board)
-      .map((idx) => getSquareNum(idx))
-      .join();
+    let choices = joinOr(
+      getEmptySquareIndexes(board).map((idx) => getSquareNum(idx))
+    );
     let choice = prompt(`Choose a square (${choices}): `);
     let choiceIdx = getBoardIndex(choice);
 
