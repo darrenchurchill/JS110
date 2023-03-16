@@ -282,6 +282,8 @@ function playTicTacToe() {
   const USER_TURN = 0;
   const COMPUTER_TURN = 1;
   let curTurn = USER_TURN;
+  // TODO: add variables for the user and computer markers
+  // TODO: let user choose their marker
 
   while (true) {
     if (curTurn === USER_TURN) {
