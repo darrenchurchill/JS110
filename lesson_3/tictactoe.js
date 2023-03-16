@@ -9,6 +9,7 @@
 const NUM_ROWS = 3;
 const NUM_COLS = 3;
 const EMPTY_SQUARE = ' ';
+const NO_WINNER = '';
 const readline = require('readline-sync');
 
 function prompt(promptText) {
@@ -203,8 +204,8 @@ function doComputerTurn(board) {
  */
 function inspect(squares) {
   let first = squares[0];
-  if (first === EMPTY_SQUARE) return '';
-  return squares.every((square) => square === first) ? first : '';
+  if (first === EMPTY_SQUARE) return NO_WINNER;
+  return squares.every((square) => square === first) ? first : NO_WINNER;
 }
 
 /**
