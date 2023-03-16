@@ -21,179 +21,166 @@ function displayOutput(output) {
 
 function displayBoard(board) {
   // TODO: make this nicer looking
-  board.forEach((row) => {
-    console.log(row);
-  });
+  for (let i = 0; i < BOARD_SIZE; i++) {
+    let rowStart = i * BOARD_SIZE;
+    console.log(getRowSlice(board, rowStart));
+  }
 }
 
-function* genRowNums() {
+function* genRowStartIndexes() {
+  for (let i = 0; i < BOARD_SIZE ** 2; i += BOARD_SIZE) {
+    yield i;
+  }
+}
+
+function* genColStartIndexes() {
   for (let i = 0; i < BOARD_SIZE; i++) {
     yield i;
   }
 }
 
-function* genColNums() {
-  for (let i = 0; i < BOARD_SIZE; i++) {
+function getRowSlice(board, rowStart) {
+  return board.slice(rowStart, rowStart + BOARD_SIZE);
+}
+
+function* genColIndexes(colStart) {
+  for (let i = colStart; i < BOARD_SIZE ** 2; i += BOARD_SIZE) {
     yield i;
   }
 }
 
-function* genRowColNums() {
-  for (let row of genRowNums()) {
-    for (let col of genColNums()) {
-      yield [row, col];
-    }
+function getColSlice(board, colStart) {
+  let col = [];
+  for (let colIdx of genColIndexes(colStart)) {
+    col.push(board[colIdx]);
+  }
+  return col;
+}
+
+function* genDiagonalIndexesTopLeftToBottomRight() {
+  let curIdx = 0;
+
+  while (curIdx < BOARD_SIZE ** 2) {
+    yield curIdx;
+    curIdx += BOARD_SIZE + 1;
   }
 }
 
-function* genDiagonalTopLeftToBottomRight() {
-  let row = 0;
-  let col = 0;
+function* genDiagonalIndexesTopRightToBottomLeft() {
+  let curIdx = BOARD_SIZE - 1;
 
-  while (row < BOARD_SIZE && col < BOARD_SIZE) {
-    yield [row, col];
-    row += 1;
-    col += 1;
-  }
-}
-
-function* genDiagonalTopRightToBottomLeft() {
-  let row = 0;
-  let col = BOARD_SIZE - 1;
-
-  while (row < BOARD_SIZE && col >= 0) {
-    yield [row, col];
-    row += 1;
-    col -= 1;
+  while (curIdx < BOARD_SIZE ** 2) {
+    yield curIdx;
+    curIdx += BOARD_SIZE - 1;
   }
 }
 
 function initializeBoard() {
   let board = [];
 
-  for (let row of genRowNums()) {
-    board.push([]);
-
-    for (let _ of genColNums()) {
-      board[row].push(EMPTY_SQUARE);
-    }
+  for (let i = 0; i < BOARD_SIZE ** 2; i++) {
+    board[i] = EMPTY_SQUARE;
   }
 
   return board;
 }
 
 /**
- * Given a square number (ex: 1-9 for a 3x3 game), return the board row and
- * column number.
- * @param {*} squareNum The square number, in the user's representation
- * @returns {Array<number>} An array containing the board row and column number
+ * Given a square number (ex: 1-9 for a 3x3 game), return corresponding board
+ * array index.
+ * @param {number} squareNum The square number, in the user's representation
+ * @returns {number} the board index
  */
-function getRowColNum(squareNum) {
-  squareNum -= 1;
-
-  let row = Math.floor(squareNum / BOARD_SIZE);
-  let col = squareNum % BOARD_SIZE;
-
-  return [row, col];
+function getBoardIndex(squareNum) {
+  return squareNum - 1;
 }
 
 /**
- * Given a row and column number, return the user-representation board square
+ * Given a board array index, return the user-representation board square
  * number (ex: 1-9 for a 3x3 game).
- * @param {number} row the board row number
- * @param {number} col the board column number
+ * @param {number} idx the board array index
  * @returns {number} the user-representation square number
  */
-function getSquareNum(row, col) {
-  let squareNum = 1;
-  squareNum += row * BOARD_SIZE;
-  squareNum += col;
-  return squareNum;
+function getSquareNum(idx) {
+  return idx + 1;
 }
 
-function getSquareContents(board, row, col) {
-  return board[row][col];
+function isEmptySquareAt(board, idx) {
+  return isEmptySquare(board[idx]);
 }
 
-function isEmptySquare(board, row, col) {
-  return getSquareContents(board, row, col) === EMPTY_SQUARE;
+function isEmptySquare(square) {
+  return square === EMPTY_SQUARE;
 }
 
-function isInBounds(row, col) {
-  return row >= 0 && row < BOARD_SIZE && col >= 0 && col < BOARD_SIZE;
+function isInBounds(idx) {
+  return idx >= 0 && idx < BOARD_SIZE ** 2;
 }
 
-function isValidMove(board, row, col) {
-  return isInBounds(row, col) && isEmptySquare(board, row, col);
+function isValidMove(board, idx) {
+  return isInBounds(idx) && isEmptySquareAt(board, idx);
 }
 
 function isBoardFull(board) {
-  for (let [row, col] of genRowColNums()) {
-    if (isEmptySquare(board, row, col)) return false;
-  }
-  return true;
+  return board.every((square) => isEmptySquare(square));
 }
 
-function markBoard(board, row, col, mark) {
-  board[row][col] = mark;
+function markBoard(board, idx, mark) {
+  board[idx] = mark;
 }
 
 /**
  * Prompt the user for their next choice and validate their input, re-prompting
  * if necessary.
- * @param {Array<Array<string>>} board the current game board
- * @returns {undefined}
+ * @param {Array<string>} board the current game board
+ * @returns {number} the user's choice
  */
 function promptPlayerSquareChoice(board) {
   // TODO: change the prompt output to show only the available valid choices
   while (true) {
     let choice = prompt(`Choose a square (1-${BOARD_SIZE * BOARD_SIZE}):`);
-    let [choiceRow, choiceCol] = getRowColNum(choice);
+    let choiceIdx = getBoardIndex(choice);
 
-    if (isValidMove(board, choiceRow, choiceCol)) return [choiceRow, choiceCol];
+    if (isValidMove(board, choiceIdx)) return choiceIdx;
     displayOutput('That is an invalid choice. Choose again.');
   }
 }
 
 /**
- * Return an array containing the `[row, col]` locations of empty squares on
+ * Return an array containing the `[idx]` locations of empty squares on
  * the game board. Returns an empty array if there are no empty squares.
- * @param {Array<Array<string>>} board the current game board
- * @returns {Array<Array<number>>} the `[row, col]` empty square locations
+ * @param {Array<string>} board the current game board
+ * @returns {<Array<number>} the `[idx,...]` empty square locations
  */
-function getEmptySquares(board) {
-  let result = [];
-
-  for (let [row, col] of genRowColNums()) {
-    if (isEmptySquare(board, row, col)) result.push([row, col]);
-  }
-
-  return result;
+function getEmptySquareIndexes(board) {
+  return Object.keys(board)
+    .map((squareIdx) => Number(squareIdx))
+    .filter((squareIdx) => isEmptySquareAt(board, squareIdx));
 }
 
 /**
  * Generate the computer's next game choice from the available empty squares.
- * @param {Array<Array<string>>} board the current game board
- * @returns {Array<Array<number>>} the `[row, col]` choice
+ * @param {Array<string>} board the current game board
+ * @returns {number} the choice board index
  */
 function getComputerSquareChoice(board) {
-  let options = getEmptySquares(board);
+  let options = getEmptySquareIndexes(board);
   let choice = Math.floor(Math.random() * options.length);
   return options[choice];
 }
 
 function doUserTurn(board) {
   displayBoard(board);
-  let [choiceRow, choiceCol] = promptPlayerSquareChoice(board);
-  markBoard(board, choiceRow, choiceCol, 'X');
+  let choice = promptPlayerSquareChoice(board);
+  markBoard(board, choice, 'X');
 }
 
 function doComputerTurn(board) {
-  let [choiceRow, choiceCol] = getComputerSquareChoice(board);
+  let choice = getComputerSquareChoice(board);
   displayOutput(
-    `Computer chooses square ${getSquareNum(choiceRow, choiceCol)}.`
+    `Computer chooses square ${getSquareNum(choice)}.`
   );
-  markBoard(board, choiceRow, choiceCol, 'O');
+  markBoard(board, choice, 'O');
 }
 
 /**
@@ -210,65 +197,59 @@ function inspect(squares) {
 
 /**
  * Inspect a single game board column for a winner.
- * @param {Array<Array<string>>} board the current game board
- * @param {number} row The row number to inspect
+ * @param {Array<string>} board the current game board
+ * @param {number} rowStartIdx The row number to inspect
  * @returns {string} The game winner's board character. `''` if there is no
  * winner.
  */
-function inspectRow(board, row) {
-  let squares = [...genColNums()].map((col) =>
-    getSquareContents(board, row, col)
-  );
-  return inspect(squares);
+function inspectRow(board, rowStartIdx) {
+  return inspect(getRowSlice(board, rowStartIdx));
 }
 
 /**
  * Inspect a single game board column for a winner.
- * @param {Array<Array<string>>} board the current game board
- * @param {number} col The column number to inspect
+ * @param {Array<string>} board the current game board
+ * @param {number} colStartIdx The column number to inspect
  * @returns {string} The game winner's board character. `''` if there is no
  * winner.
  */
-function inspectCol(board, col) {
-  let squares = [...genRowNums()].map((row) =>
-    getSquareContents(board, row, col)
-  );
-  return inspect(squares);
+function inspectCol(board, colStartIdx) {
+  return inspect(getColSlice(board, colStartIdx));
 }
 
 /**
  * Inspect the game board diagonals for a winner.
- * @param {Array<Array<string>>} board the current game board
+ * @param {Array<string>} board the current game board
  * @returns {string} The game winner's board character. `''` if there is no
  * winner.
  */
 function inspectDiagonals(board) {
-  let squares = [...genDiagonalTopLeftToBottomRight()].map(([row, col]) =>
-    getSquareContents(board, row, col)
+  let squares = [...genDiagonalIndexesTopLeftToBottomRight()].map((idx) =>
+    board[idx]
   );
   let result = inspect(squares);
   if (result) return result;
 
-  squares = [...genDiagonalTopRightToBottomLeft()].map(([row, col]) =>
-    getSquareContents(board, row, col)
+  squares = [...genDiagonalIndexesTopRightToBottomLeft()].map((idx) =>
+    board[idx]
   );
   return inspect(squares);
 }
 
 /**
  * Inspect the game board for a winner.
- * @param {Array<Array<string>>} board the current game board
+ * @param {Array<string>} board the current game board
  * @returns {string} The game winner's board character. `''` if there is no
  * winner.
  */
 function inspectForWinner(board) {
-  for (let row of genRowNums()) {
-    let result = inspectRow(board, row);
+  for (let rowStartIdx of genRowStartIndexes()) {
+    let result = inspectRow(board, rowStartIdx);
     if (result) return result;
   }
 
-  for (let col of genColNums()) {
-    let result = inspectCol(board, col);
+  for (let colStartIdx of genColStartIndexes()) {
+    let result = inspectCol(board, colStartIdx);
     if (result) return result;
   }
 
