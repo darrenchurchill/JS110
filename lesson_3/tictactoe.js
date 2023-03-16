@@ -146,6 +146,7 @@ function markBoard(board, row, col, mark) {
  * @returns {undefined}
  */
 function promptPlayerSquareChoice(board) {
+  // TODO: change the prompt output to show only the available valid choices
   while (true) {
     let choice = prompt(`Choose a square (1-${NUM_ROWS * NUM_COLS}):`);
     let [choiceRow, choiceCol] = getRowColNum(choice);
