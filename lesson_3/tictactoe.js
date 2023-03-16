@@ -8,6 +8,7 @@
  */
 const NUM_ROWS = 3;
 const NUM_COLS = 3;
+const EMPTY_SQUARE = ' ';
 const readline = require('readline-sync');
 
 function prompt(promptText) {
@@ -74,7 +75,7 @@ function initializeBoard() {
     board.push([]);
 
     for (let _ of genColNums()) {
-      board[row].push(' ');
+      board[row].push(EMPTY_SQUARE);
     }
   }
 
@@ -115,7 +116,7 @@ function getSquareContents(board, row, col) {
 }
 
 function isEmptySquare(board, row, col) {
-  return getSquareContents(board, row, col) === ' ';
+  return getSquareContents(board, row, col) === EMPTY_SQUARE;
 }
 
 function isInBounds(row, col) {
@@ -202,7 +203,7 @@ function doComputerTurn(board) {
  */
 function inspect(squares) {
   let first = squares[0];
-  if (first === ' ') return '';
+  if (first === EMPTY_SQUARE) return '';
   return squares.every((square) => square === first) ? first : '';
 }
 
