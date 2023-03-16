@@ -136,9 +136,11 @@ function markBoard(board, idx, mark) {
  * @returns {number} the user's choice
  */
 function promptPlayerSquareChoice(board) {
-  // TODO: change the prompt output to show only the available valid choices
   while (true) {
-    let choice = prompt(`Choose a square (1-${BOARD_SIZE * BOARD_SIZE}):`);
+    let choices = getEmptySquareIndexes(board)
+      .map((idx) => getSquareNum(idx))
+      .join();
+    let choice = prompt(`Choose a square (${choices}): `);
     let choiceIdx = getBoardIndex(choice);
 
     if (isValidMove(board, choiceIdx)) return choiceIdx;
