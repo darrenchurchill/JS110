@@ -6,8 +6,7 @@
  *
  * A command-line tic tac toe game against the computer
  */
-const NUM_ROWS = 3;
-const NUM_COLS = 3;
+const BOARD_SIZE = 3;
 const EMPTY_SQUARE = ' ';
 const NO_WINNER = '';
 const readline = require('readline-sync');
@@ -28,13 +27,13 @@ function displayBoard(board) {
 }
 
 function* genRowNums() {
-  for (let i = 0; i < NUM_ROWS; i++) {
+  for (let i = 0; i < BOARD_SIZE; i++) {
     yield i;
   }
 }
 
 function* genColNums() {
-  for (let i = 0; i < NUM_COLS; i++) {
+  for (let i = 0; i < BOARD_SIZE; i++) {
     yield i;
   }
 }
@@ -51,7 +50,7 @@ function* genDiagonalTopLeftToBottomRight() {
   let row = 0;
   let col = 0;
 
-  while (row < NUM_ROWS && col < NUM_COLS) {
+  while (row < BOARD_SIZE && col < BOARD_SIZE) {
     yield [row, col];
     row += 1;
     col += 1;
@@ -60,9 +59,9 @@ function* genDiagonalTopLeftToBottomRight() {
 
 function* genDiagonalTopRightToBottomLeft() {
   let row = 0;
-  let col = NUM_COLS - 1;
+  let col = BOARD_SIZE - 1;
 
-  while (row < NUM_ROWS && col >= 0) {
+  while (row < BOARD_SIZE && col >= 0) {
     yield [row, col];
     row += 1;
     col -= 1;
@@ -92,8 +91,8 @@ function initializeBoard() {
 function getRowColNum(squareNum) {
   squareNum -= 1;
 
-  let row = Math.floor(squareNum / NUM_COLS);
-  let col = squareNum % NUM_COLS;
+  let row = Math.floor(squareNum / BOARD_SIZE);
+  let col = squareNum % BOARD_SIZE;
 
   return [row, col];
 }
@@ -107,7 +106,7 @@ function getRowColNum(squareNum) {
  */
 function getSquareNum(row, col) {
   let squareNum = 1;
-  squareNum += row * NUM_COLS;
+  squareNum += row * BOARD_SIZE;
   squareNum += col;
   return squareNum;
 }
@@ -121,7 +120,7 @@ function isEmptySquare(board, row, col) {
 }
 
 function isInBounds(row, col) {
-  return row >= 0 && row < NUM_ROWS && col >= 0 && col < NUM_COLS;
+  return row >= 0 && row < BOARD_SIZE && col >= 0 && col < BOARD_SIZE;
 }
 
 function isValidMove(board, row, col) {
@@ -148,7 +147,7 @@ function markBoard(board, row, col, mark) {
 function promptPlayerSquareChoice(board) {
   // TODO: change the prompt output to show only the available valid choices
   while (true) {
-    let choice = prompt(`Choose a square (1-${NUM_ROWS * NUM_COLS}):`);
+    let choice = prompt(`Choose a square (1-${BOARD_SIZE * BOARD_SIZE}):`);
     let [choiceRow, choiceCol] = getRowColNum(choice);
 
     if (isValidMove(board, choiceRow, choiceCol)) return [choiceRow, choiceCol];
