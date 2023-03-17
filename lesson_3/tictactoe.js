@@ -8,8 +8,8 @@
  */
 const BOARD_SIZE = 3;
 const GAME_RESULT_TIE = 0;
-const GAME_RESULT_USER_WIN = 1;
-const GAME_RESULT_COMPUTER_WIN = 2;
+const GAME_PLAYER_TYPE_USER = 0;
+const GAME_PLAYER_TYPE_COMPUTER = 1;
 const EMPTY_SQUARE = ' ';
 const NO_WINNER = '';
 const readline = require('readline-sync');
@@ -191,18 +191,18 @@ function getComputerSquareChoice(board) {
   return options[choice];
 }
 
-function doUserTurn(board, userMark) {
+function doUserTurn(board, playerInfo) {
   displayBoard(board);
   let choice = promptPlayerSquareChoice(board);
-  markBoard(board, choice, userMark);
+  markBoard(board, choice, playerInfo.mark);
 }
 
-function doComputerTurn(board, computerMark) {
+function doComputerTurn(board, playerInfo) {
   let choice = getComputerSquareChoice(board);
   displayOutput(
-    `Computer chooses square ${getSquareNum(choice)}.`
+    `${playerInfo.name} chooses square ${getSquareNum(choice)}.`
   );
-  markBoard(board, choice, computerMark);
+  markBoard(board, choice, playerInfo.mark);
 }
 
 /**
@@ -278,10 +278,8 @@ function inspectForWinner(board) {
   return inspectDiagonals(board);
 }
 
-function getWinner(winnerMark, userInfo, computerInfo) {
-  return winnerMark === userInfo.mark
-    ? userInfo
-    : computerInfo;
+function getWinner(winnerMark, player1, player2) {
+  return winnerMark === player1.mark ? player1 : player2;
 }
 
 function displayWinnerResult(board, winner) {
@@ -296,38 +294,26 @@ function displayTieResult(board) {
 }
 
 // eslint-disable-next-line max-lines-per-function, max-statements
-function playTicTacToe(userInfo, computerInfo) {
+function playTicTacToe(player1, player2) {
   let board = initializeBoard();
-  const USER_TURN = 0;
-  const COMPUTER_TURN = 1;
-  let curTurn = USER_TURN;
-
-  // TODO: let user choose their marker
-  if (!userInfo) userInfo = { name: 'User', mark: 'X' };
-  if (!computerInfo) computerInfo = { name: 'Computer', mark: 'O' };
+  let curPlayer = player1;
 
   while (true) {
-    if (curTurn === USER_TURN) {
-      doUserTurn(board, userInfo.mark);
-      curTurn = COMPUTER_TURN;
-    } else if (curTurn === COMPUTER_TURN) {
-      doComputerTurn(board, computerInfo.mark);
-      curTurn = USER_TURN;
-    }
-
+    curPlayer.gameChoiceCallback(board, curPlayer);
     let curResult = inspectForWinner(board);
+
     if (curResult) {
-      let winner = getWinner(curResult, userInfo, computerInfo);
+      let winner = getWinner(curResult, player1, player2);
       displayWinnerResult(board, winner);
-      return winner === userInfo
-        ? GAME_RESULT_USER_WIN
-        : GAME_RESULT_COMPUTER_WIN;
+      return winner === player1 ? player1 : player2;
     }
 
     if (isBoardFull(board)) {
       displayTieResult(board);
       return GAME_RESULT_TIE;
     }
+
+    curPlayer = curPlayer === player1 ? player2 : player1;
   }
 }
 
@@ -350,29 +336,124 @@ function displayMatchWinner(winnerInfo) {
   displayOutput(`${winnerInfo.name} wins the match!!!`);
 }
 
-function playMatch(matchSize = 5) {
-  let userInfo = { name: 'User', mark: 'X', numWins: 0 };
-  let computerInfo = { name: 'Computer', mark: 'O', numWins: 0 };
+function playMatch(matchSize = 5, player1, player2) {
+  let player1NumWinsOrig = player1.numWins;
+  let player2NumWinsOrig = player2.numWins;
+  player1.numWins = 0;
+  player2.numWins = 0;
   let winner = null;
 
   while (!winner) {
-    displayMatchScore(userInfo, computerInfo);
-    let gameResult = playTicTacToe();
+    displayMatchScore(player1, player2);
+    let gameResult = playTicTacToe(player1, player2);
 
-    if (gameResult === GAME_RESULT_USER_WIN) userInfo.numWins += 1;
-    else if (gameResult === GAME_RESULT_COMPUTER_WIN) computerInfo.numWins += 1;
+    if (gameResult === player1) player1.numWins += 1;
+    else if (gameResult === player2) player2.numWins += 1;
 
-    if (userInfo.numWins === matchSize) winner = userInfo;
-    else if (computerInfo.numWins === matchSize) winner = computerInfo;
+    if (player1.numWins === matchSize) winner = player1;
+    else if (player2.numWins === matchSize) winner = player2;
   }
 
-  displayMatchScore(userInfo, computerInfo);
+  displayMatchScore(player1, player2);
   displayMatchWinner(winner);
+
+  player1.numWins = player1NumWinsOrig;
+  player2.numWins = player2NumWinsOrig;
+}
+
+/**
+ *
+ * @param {string} mark
+ * @param {string} otherUserMark
+ * @returns {boolean}
+ */
+function isValidUserMark(mark, otherUserMark) {
+  return mark.length === 1 && !otherUserMark.includes(mark);
+}
+
+/**
+ *
+ * @param {string} otherUserMark
+ */
+function getDefaultUserMark(otherUserMark) {
+  if (otherUserMark === '' || otherUserMark === 'O') return 'X';
+  return 'O';
+}
+
+function promptUserMark(otherUserMark) {
+  let defaultUserMark = getDefaultUserMark(otherUserMark);
+  let mark;
+
+  while (true) {
+    mark = readline.question(`User board mark? [${defaultUserMark}]: `);
+    if (mark === '' || isValidUserMark(mark, otherUserMark)) break;
+
+    displayOutput('That is an invalid user board mark.');
+    displayOutput("Must be 1 character, and NOT the other player's mark.");
+  }
+  return mark ? mark : defaultUserMark;
+}
+
+function promptUserName(defaultName) {
+  let name = readline.question(`User name? [${defaultName}]: `);
+
+  return name ? name : defaultName;
+}
+
+function promptUserType(defaultUserType = GAME_PLAYER_TYPE_USER) {
+  let otherUserType;
+  let defaultTypeStr;
+
+  if (defaultUserType === GAME_PLAYER_TYPE_USER) {
+    otherUserType = GAME_PLAYER_TYPE_COMPUTER;
+    defaultTypeStr = 'U';
+  } else {
+    otherUserType = GAME_PLAYER_TYPE_USER;
+    defaultTypeStr = 'C';
+  }
+
+  let type = readline.question(`User type? (user/computer) [${defaultTypeStr}] `);
+
+  return type === '' || type.toUpperCase() === defaultTypeStr
+    ? defaultUserType
+    : otherUserType;
+}
+
+function promptConfigureUser(userNum, defaultUserType, otherUser) {
+  let user = {};
+  let defaultName = `User ${userNum}`;
+
+  displayOutput(`User ${userNum} Setup:`);
+
+  user.name = promptUserName(defaultName);
+
+  let otherUserMark = otherUser ? otherUser.mark : '';
+  user.mark = promptUserMark(otherUserMark);
+
+  let userType = promptUserType(defaultUserType);
+  if (userType === GAME_PLAYER_TYPE_USER) {
+    user.gameChoiceCallback = doUserTurn;
+  } else if (userType === GAME_PLAYER_TYPE_COMPUTER) {
+    user.gameChoiceCallback = doComputerTurn;
+  }
+
+  return user;
+}
+
+function promptConfigureGame() {
+  // TODO: add board size to this configuration prompt
+  // TODO: add match number of games to this configuration prompt
+  let player1 = promptConfigureUser(1, GAME_PLAYER_TYPE_USER);
+  let player2 = promptConfigureUser(2, GAME_PLAYER_TYPE_COMPUTER, player1);
+
+  return [player1, player2];
 }
 
 function play() {
+  let [player1, player2] = promptConfigureGame();
+
   while (true) {
-    playMatch(5);
+    playMatch(5, player1, player2);
     if (!shouldPlayAgain()) return;
   }
 }
