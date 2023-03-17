@@ -198,6 +198,9 @@ function getEmptySquareIndexes(board) {
  * @returns {number} the choice board index
  */
 function getComputerSquareChoice(board) {
+  let atRiskSquareIdx = findAtRiskSquareIndex(board);
+  if (atRiskSquareIdx >= 0) return atRiskSquareIdx;
+
   let options = getEmptySquareIndexes(board);
   let choice = Math.floor(Math.random() * options.length);
   return options[choice];
@@ -284,6 +287,46 @@ function inspectForWinner(board) {
   }
 
   return inspectDiagonals(board);
+}
+
+function indexOfSingleEmptySquare(board, squareIndexes) {
+  let indexesOfEmpties = squareIndexes.filter((squareIdx) =>
+    isEmptySquareAt(board, squareIdx)
+  );
+  if (indexesOfEmpties.length === 1) return indexesOfEmpties[0];
+
+  return -1;
+}
+
+function findAtRiskSquareIndexOfRow(board, rowStartIdx) {
+  return indexOfSingleEmptySquare(board, [...genRowIndexes(rowStartIdx)]);
+}
+
+function findAtRiskSquareIndexOfCol(board, colStartIdx) {
+  return indexOfSingleEmptySquare(board, [...genColIndexes(colStartIdx)]);
+}
+
+function findAtRiskSquareIndex(board) {
+  let atRiskSquareIdx = -1;
+
+  for (let rowStartIdx of genRowStartIndexes()) {
+    atRiskSquareIdx = findAtRiskSquareIndexOfRow(board, rowStartIdx);
+    if (atRiskSquareIdx >= 0) return atRiskSquareIdx;
+  }
+
+  for (let colStartIdx of genColStartIndexes()) {
+    atRiskSquareIdx = findAtRiskSquareIndexOfCol(board, colStartIdx);
+    if (atRiskSquareIdx >= 0) return atRiskSquareIdx;
+  }
+
+  atRiskSquareIdx = indexOfSingleEmptySquare(board, [
+    ...genDiagonalIndexesTopLeftToBottomRight(),
+  ]);
+  if (atRiskSquareIdx >= 0) return atRiskSquareIdx;
+
+  return indexOfSingleEmptySquare(board, [
+    ...genDiagonalIndexesTopRightToBottomLeft(),
+  ]);
 }
 
 function getWinner(winnerMark, player1, player2) {
