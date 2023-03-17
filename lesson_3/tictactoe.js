@@ -283,7 +283,7 @@ function getWinner(winnerMark, player1, player2) {
 }
 
 function displayWinnerResult(board, winner) {
-  displayOutput('We have a winner!!!');
+  displayOutput('\nWe have a winner!!!');
   displayBoard(board);
   displayOutput(`${winner.name} wins!!!`);
 }
@@ -324,16 +324,16 @@ function shouldPlayAgain() {
 
 function displayMatchScore(userInfo, computerInfo) {
   displayOutput(
-    `###### Match Score: `
-    + `${userInfo.name} ${userInfo.numWins} `
-    + `${computerInfo.name} ${computerInfo.numWins} `
-    + '######'
+    `\n###### Match Score: `
+    + `${userInfo.name}: ${userInfo.numWins} `
+    + `${computerInfo.name}: ${computerInfo.numWins} `
+    + '######\n'
   );
 }
 
 function displayMatchWinner(winnerInfo) {
   displayOutput('!!!!!! We have a Match Winner !!!!!!');
-  displayOutput(`${winnerInfo.name} wins the match!!!`);
+  displayOutput(`${winnerInfo.name} wins the match!!!\n`);
 }
 
 function playMatch(matchSize = 5, player1, player2) {
