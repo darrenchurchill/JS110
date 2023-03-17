@@ -122,7 +122,7 @@ function isValidMove(board, idx) {
 }
 
 function isBoardFull(board) {
-  return board.every((square) => isEmptySquare(square));
+  return board.every((square) => !isEmptySquare(square));
 }
 
 function markBoard(board, idx, mark) {
