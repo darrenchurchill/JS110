@@ -7,6 +7,9 @@
  * A command-line tic tac toe game against the computer
  */
 const BOARD_SIZE = 3;
+const GAME_RESULT_TIE = 0;
+const GAME_RESULT_USER_WIN = 1;
+const GAME_RESULT_COMPUTER_WIN = 2;
 const EMPTY_SQUARE = ' ';
 const NO_WINNER = '';
 const readline = require('readline-sync');
@@ -188,18 +191,18 @@ function getComputerSquareChoice(board) {
   return options[choice];
 }
 
-function doUserTurn(board) {
+function doUserTurn(board, userMark) {
   displayBoard(board);
   let choice = promptPlayerSquareChoice(board);
-  markBoard(board, choice, 'X');
+  markBoard(board, choice, userMark);
 }
 
-function doComputerTurn(board) {
+function doComputerTurn(board, computerMark) {
   let choice = getComputerSquareChoice(board);
   displayOutput(
     `Computer chooses square ${getSquareNum(choice)}.`
   );
-  markBoard(board, choice, 'O');
+  markBoard(board, choice, computerMark);
 }
 
 /**
@@ -275,36 +278,55 @@ function inspectForWinner(board) {
   return inspectDiagonals(board);
 }
 
+function getWinner(winnerMark, userInfo, computerInfo) {
+  return winnerMark === userInfo.mark
+    ? userInfo
+    : computerInfo;
+}
+
+function displayWinnerResult(board, winner) {
+  displayOutput('We have a winner!!!');
+  displayBoard(board);
+  displayOutput(`${winner.name} wins!!!`);
+}
+
+function displayTieResult(board) {
+  displayOutput("It's a tie.");
+  displayBoard(board);
+}
+
 // eslint-disable-next-line max-lines-per-function, max-statements
-function playTicTacToe() {
+function playTicTacToe(userInfo, computerInfo) {
   let board = initializeBoard();
   const USER_TURN = 0;
   const COMPUTER_TURN = 1;
   let curTurn = USER_TURN;
-  // TODO: add variables for the user and computer markers
+
   // TODO: let user choose their marker
+  if (!userInfo) userInfo = { name: 'User', mark: 'X' };
+  if (!computerInfo) computerInfo = { name: 'Computer', mark: 'O' };
 
   while (true) {
     if (curTurn === USER_TURN) {
-      doUserTurn(board);
+      doUserTurn(board, userInfo.mark);
       curTurn = COMPUTER_TURN;
     } else if (curTurn === COMPUTER_TURN) {
-      doComputerTurn(board);
+      doComputerTurn(board, computerInfo.mark);
       curTurn = USER_TURN;
     }
 
     let curResult = inspectForWinner(board);
     if (curResult) {
-      displayOutput('We have a winner!!!');
-      displayBoard(board);
-      displayOutput(`${curResult} wins!!!`);
-      return;
+      let winner = getWinner(curResult, userInfo, computerInfo);
+      displayWinnerResult(board, winner);
+      return winner === userInfo
+        ? GAME_RESULT_USER_WIN
+        : GAME_RESULT_COMPUTER_WIN;
     }
 
     if (isBoardFull(board)) {
-      displayOutput("It's a tie.");
-      displayBoard(board);
-      return;
+      displayTieResult(board);
+      return GAME_RESULT_TIE;
     }
   }
 }
@@ -314,11 +336,45 @@ function shouldPlayAgain() {
   return input.toLowerCase() === 'y';
 }
 
-function playRounds() {
+function displayMatchScore(userInfo, computerInfo) {
+  displayOutput(
+    `###### Match Score: `
+    + `${userInfo.name} ${userInfo.numWins} `
+    + `${computerInfo.name} ${computerInfo.numWins} `
+    + '######'
+  );
+}
+
+function displayMatchWinner(winnerInfo) {
+  displayOutput('!!!!!! We have a Match Winner !!!!!!');
+  displayOutput(`${winnerInfo.name} wins the match!!!`);
+}
+
+function playMatch(matchSize = 5) {
+  let userInfo = { name: 'User', mark: 'X', numWins: 0 };
+  let computerInfo = { name: 'Computer', mark: 'O', numWins: 0 };
+  let winner = null;
+
+  while (!winner) {
+    displayMatchScore(userInfo, computerInfo);
+    let gameResult = playTicTacToe();
+
+    if (gameResult === GAME_RESULT_USER_WIN) userInfo.numWins += 1;
+    else if (gameResult === GAME_RESULT_COMPUTER_WIN) computerInfo.numWins += 1;
+
+    if (userInfo.numWins === matchSize) winner = userInfo;
+    else if (computerInfo.numWins === matchSize) winner = computerInfo;
+  }
+
+  displayMatchScore(userInfo, computerInfo);
+  displayMatchWinner(winner);
+}
+
+function play() {
   while (true) {
-    playTicTacToe();
+    playMatch(5);
     if (!shouldPlayAgain()) return;
   }
 }
 
-playRounds();
+play();
