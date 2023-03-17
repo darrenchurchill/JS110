@@ -69,7 +69,7 @@ function* genDiagonalIndexesTopLeftToBottomRight() {
 function* genDiagonalIndexesTopRightToBottomLeft() {
   let curIdx = BOARD_SIZE - 1;
 
-  while (curIdx < BOARD_SIZE ** 2) {
+  while (curIdx < (BOARD_SIZE ** 2) - 1) {
     yield curIdx;
     curIdx += BOARD_SIZE - 1;
   }
