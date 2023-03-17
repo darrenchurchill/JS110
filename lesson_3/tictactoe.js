@@ -42,8 +42,24 @@ function* genColStartIndexes() {
   }
 }
 
+/**
+ *
+ * @param {Array<string>} board
+ * @param {Generator} sliceGenerator
+ * @returns
+ */
+function getBoardSlice(board, sliceGenerator) {
+  return [...sliceGenerator].map((idx) => board[idx]);
+}
+
+function* genRowIndexes(rowStart) {
+  for (let i = rowStart; i < rowStart + BOARD_SIZE; i++) {
+    yield i;
+  }
+}
+
 function getRowSlice(board, rowStart) {
-  return board.slice(rowStart, rowStart + BOARD_SIZE);
+  return getBoardSlice(board, genRowIndexes(rowStart));
 }
 
 function* genColIndexes(colStart) {
@@ -53,11 +69,7 @@ function* genColIndexes(colStart) {
 }
 
 function getColSlice(board, colStart) {
-  let col = [];
-  for (let colIdx of genColIndexes(colStart)) {
-    col.push(board[colIdx]);
-  }
-  return col;
+  return getBoardSlice(board, genColIndexes(colStart));
 }
 
 function* genDiagonalIndexesTopLeftToBottomRight() {
@@ -246,15 +258,11 @@ function inspectCol(board, colStartIdx) {
  * winner.
  */
 function inspectDiagonals(board) {
-  let squares = [...genDiagonalIndexesTopLeftToBottomRight()].map((idx) =>
-    board[idx]
-  );
+  let squares = getBoardSlice(board, genDiagonalIndexesTopLeftToBottomRight());
   let result = inspect(squares);
   if (result) return result;
 
-  squares = [...genDiagonalIndexesTopRightToBottomLeft()].map((idx) =>
-    board[idx]
-  );
+  squares = getBoardSlice(board, genDiagonalIndexesTopRightToBottomLeft());
   return inspect(squares);
 }
 
