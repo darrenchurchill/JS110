@@ -392,6 +392,8 @@ function playTicTacToe(player1, player2) {
   let curPlayer = player1;
   let otherPlayer = player2;
 
+  displayOutput(`${curPlayer.name} goes first!`);
+
   while (true) {
     curPlayer.gameChoiceCallback(board, curPlayer, otherPlayer);
     let curResult = inspectForWinner(board);
@@ -432,26 +434,33 @@ function displayMatchWinner(winnerInfo) {
   displayOutput(`${winnerInfo.name} wins the match!!!\n`);
 }
 
+// eslint-disable-next-line max-lines-per-function, max-statements
 function playMatch(matchSize = 5, player1, player2) {
   let player1NumWinsOrig = player1.numWins;
   let player2NumWinsOrig = player2.numWins;
   player1.numWins = 0;
   player2.numWins = 0;
-  let winner = null;
+  let curOrder = [player1, player2];
+  let matchWinner = null;
 
-  while (!winner) {
+  while (!matchWinner) {
     displayMatchScore(player1, player2);
-    let gameResult = playTicTacToe(player1, player2);
+    let gameResult = playTicTacToe(...curOrder);
 
-    if (gameResult === player1) player1.numWins += 1;
-    else if (gameResult === player2) player2.numWins += 1;
+    if (gameResult === player1) {
+      player1.numWins += 1;
+      curOrder = [player2, player1];
+    } else if (gameResult === player2) {
+      player2.numWins += 1;
+      curOrder = [player1, player2];
+    }
 
-    if (player1.numWins === matchSize) winner = player1;
-    else if (player2.numWins === matchSize) winner = player2;
+    if (player1.numWins === matchSize) matchWinner = player1;
+    else if (player2.numWins === matchSize) matchWinner = player2;
   }
 
   displayMatchScore(player1, player2);
-  displayMatchWinner(winner);
+  displayMatchWinner(matchWinner);
 
   player1.numWins = player1NumWinsOrig;
   player2.numWins = player2NumWinsOrig;
@@ -565,7 +574,6 @@ function promptConfigureGame() {
   let player2 = promptConfigureUser(2, GAME_PLAYER_TYPE_COMPUTER, player1);
 
   [player1, player2] = promptPlayerOrder(player1, player2);
-  displayOutput(`${player1.name} goes first!`);
 
   return [player1, player2];
 }
