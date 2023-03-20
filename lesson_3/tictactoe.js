@@ -198,12 +198,12 @@ function getEmptySquareIndexes(board) {
  * @returns {number} the choice board index
  */
 function getComputerSquareChoice(board, playerInfo, otherPlayerInfo) {
-  // Defense: Check if there are any squares at risk to the computer.
-  let atRiskSquareIdx = findAtRiskSquareIndex(board, otherPlayerInfo.mark);
+  // Offense: Check if there are any squares at risk to the other player.
+  let atRiskSquareIdx = findAtRiskSquareIndex(board, playerInfo.mark);
   if (atRiskSquareIdx >= 0) return atRiskSquareIdx;
 
-  // Offense: Check if there are any squares at risk to the other player.
-  atRiskSquareIdx = findAtRiskSquareIndex(board, playerInfo.mark);
+  // Defense: Check if there are any squares at risk to the computer.
+  atRiskSquareIdx = findAtRiskSquareIndex(board, otherPlayerInfo.mark);
   if (atRiskSquareIdx >= 0) return atRiskSquareIdx;
 
   // Otherwise: Just pick randomly.
