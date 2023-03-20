@@ -197,10 +197,16 @@ function getEmptySquareIndexes(board) {
  * @param {Array<string>} board the current game board
  * @returns {number} the choice board index
  */
-function getComputerSquareChoice(board, otherPlayerInfo) {
+function getComputerSquareChoice(board, playerInfo, otherPlayerInfo) {
+  // Defense: Check if there are any squares at risk to the computer.
   let atRiskSquareIdx = findAtRiskSquareIndex(board, otherPlayerInfo.mark);
   if (atRiskSquareIdx >= 0) return atRiskSquareIdx;
 
+  // Offense: Check if there are any squares at risk to the other player.
+  atRiskSquareIdx = findAtRiskSquareIndex(board, playerInfo.mark);
+  if (atRiskSquareIdx >= 0) return atRiskSquareIdx;
+
+  // Otherwise: Just pick randomly.
   let options = getEmptySquareIndexes(board);
   let choice = Math.floor(Math.random() * options.length);
   return options[choice];
@@ -213,7 +219,7 @@ function doUserTurn(board, playerInfo) {
 }
 
 function doComputerTurn(board, playerInfo, otherPlayerInfo) {
-  let choice = getComputerSquareChoice(board, otherPlayerInfo);
+  let choice = getComputerSquareChoice(board, playerInfo, otherPlayerInfo);
   displayOutput(
     `${playerInfo.name} chooses square ${getSquareNum(choice)}.`
   );
