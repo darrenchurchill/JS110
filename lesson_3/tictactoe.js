@@ -206,6 +206,12 @@ function getComputerSquareChoice(board, playerInfo, otherPlayerInfo) {
   atRiskSquareIdx = findAtRiskSquareIndex(board, otherPlayerInfo.mark);
   if (atRiskSquareIdx >= 0) return atRiskSquareIdx;
 
+  // Pick middle square if there is a middle square and it's empty
+  if (BOARD_SIZE % 2 === 1) {
+    let midIdx = Math.floor((BOARD_SIZE ** 2) / 2);
+    if (isEmptySquareAt(board, midIdx)) return midIdx;
+  }
+
   // Otherwise: Just pick randomly.
   let options = getEmptySquareIndexes(board);
   let choice = Math.floor(Math.random() * options.length);
