@@ -536,11 +536,36 @@ function promptConfigureUser(userNum, defaultUserType, otherUser) {
   return user;
 }
 
+function promptPlayerOrder(player1, player2) {
+  const choices = [1, 2, 3];
+  displayOutput(`Which player should go first? `
+                + `${player1.name}: ${choices[0]} | `
+                + `${player2.name}: ${choices[1]} | `
+                + `random: ${choices[2]}`);
+
+  let choice;
+  while (true) {
+    choice = prompt('> ');
+    if (choices.includes(choice)) break;
+    displayOutput('Invalid choice.');
+  }
+
+  if (choice === choices[0]) return [player1, player2];
+  if (choice === choices[1]) return [player2, player1];
+
+  return Math.floor(Math.random() * 2) === 0
+    ? [player1, player2]
+    : [player2, player1];
+}
+
 function promptConfigureGame() {
   // TODO: add board size to this configuration prompt
   // TODO: add match number of games to this configuration prompt
   let player1 = promptConfigureUser(1, GAME_PLAYER_TYPE_USER);
   let player2 = promptConfigureUser(2, GAME_PLAYER_TYPE_COMPUTER, player1);
+
+  [player1, player2] = promptPlayerOrder(player1, player2);
+  displayOutput(`${player1.name} goes first!`);
 
   return [player1, player2];
 }
