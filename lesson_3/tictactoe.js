@@ -197,8 +197,8 @@ function getEmptySquareIndexes(board) {
  * @param {Array<string>} board the current game board
  * @returns {number} the choice board index
  */
-function getComputerSquareChoice(board) {
-  let atRiskSquareIdx = findAtRiskSquareIndex(board);
+function getComputerSquareChoice(board, otherPlayerInfo) {
+  let atRiskSquareIdx = findAtRiskSquareIndex(board, otherPlayerInfo.mark);
   if (atRiskSquareIdx >= 0) return atRiskSquareIdx;
 
   let options = getEmptySquareIndexes(board);
@@ -212,8 +212,8 @@ function doUserTurn(board, playerInfo) {
   markBoard(board, choice, playerInfo.mark);
 }
 
-function doComputerTurn(board, playerInfo) {
-  let choice = getComputerSquareChoice(board);
+function doComputerTurn(board, playerInfo, otherPlayerInfo) {
+  let choice = getComputerSquareChoice(board, otherPlayerInfo);
   displayOutput(
     `${playerInfo.name} chooses square ${getSquareNum(choice)}.`
   );
@@ -298,35 +298,65 @@ function indexOfSingleEmptySquare(board, squareIndexes) {
   return -1;
 }
 
-function findAtRiskSquareIndexOfRow(board, rowStartIdx) {
-  return indexOfSingleEmptySquare(board, [...genRowIndexes(rowStartIdx)]);
+function hasOtherPlayerMark(board, squareIndexes, playerMark) {
+  return squareIndexes.some(
+    (idx) => !isEmptySquareAt(board, idx) && board[idx] !== playerMark
+  );
 }
 
-function findAtRiskSquareIndexOfCol(board, colStartIdx) {
-  return indexOfSingleEmptySquare(board, [...genColIndexes(colStartIdx)]);
+function findAtRiskSquareIndexOfIndexSlice(board, squareIndexes, playerMark) {
+  if (hasOtherPlayerMark(board, squareIndexes, playerMark)) return -1;
+  return indexOfSingleEmptySquare(board, squareIndexes);
 }
 
-function findAtRiskSquareIndex(board) {
+function findAtRiskSquareIndexOfRow(board, rowStartIdx, playerMark) {
+  let squareIndexes = [...genRowIndexes(rowStartIdx)];
+  if (hasOtherPlayerMark(board, squareIndexes, playerMark)) return -1;
+
+  return indexOfSingleEmptySquare(board, squareIndexes);
+}
+
+function findAtRiskSquareIndexOfCol(board, colStartIdx, playerMark) {
+  let squareIndexes = [...genColIndexes(colStartIdx)];
+  if (hasOtherPlayerMark(board, squareIndexes, playerMark)) return -1;
+
+  return indexOfSingleEmptySquare(board, squareIndexes);
+}
+
+// eslint-disable-next-line max-lines-per-function
+function findAtRiskSquareIndex(board, playerMark) {
   let atRiskSquareIdx = -1;
 
   for (let rowStartIdx of genRowStartIndexes()) {
-    atRiskSquareIdx = findAtRiskSquareIndexOfRow(board, rowStartIdx);
+    atRiskSquareIdx = findAtRiskSquareIndexOfRow(
+      board,
+      rowStartIdx,
+      playerMark
+    );
     if (atRiskSquareIdx >= 0) return atRiskSquareIdx;
   }
 
   for (let colStartIdx of genColStartIndexes()) {
-    atRiskSquareIdx = findAtRiskSquareIndexOfCol(board, colStartIdx);
+    atRiskSquareIdx = findAtRiskSquareIndexOfCol(
+      board,
+      colStartIdx,
+      playerMark
+    );
     if (atRiskSquareIdx >= 0) return atRiskSquareIdx;
   }
 
-  atRiskSquareIdx = indexOfSingleEmptySquare(board, [
-    ...genDiagonalIndexesTopLeftToBottomRight(),
-  ]);
+  atRiskSquareIdx = findAtRiskSquareIndexOfIndexSlice(
+    board,
+    [...genDiagonalIndexesTopLeftToBottomRight()],
+    playerMark
+  );
   if (atRiskSquareIdx >= 0) return atRiskSquareIdx;
 
-  return indexOfSingleEmptySquare(board, [
-    ...genDiagonalIndexesTopRightToBottomLeft(),
-  ]);
+  return findAtRiskSquareIndexOfIndexSlice(
+    board,
+    [...genDiagonalIndexesTopRightToBottomLeft()],
+    playerMark
+  );
 }
 
 function getWinner(winnerMark, player1, player2) {
@@ -348,9 +378,10 @@ function displayTieResult(board) {
 function playTicTacToe(player1, player2) {
   let board = initializeBoard();
   let curPlayer = player1;
+  let otherPlayer = player2;
 
   while (true) {
-    curPlayer.gameChoiceCallback(board, curPlayer);
+    curPlayer.gameChoiceCallback(board, curPlayer, otherPlayer);
     let curResult = inspectForWinner(board);
 
     if (curResult) {
@@ -364,7 +395,9 @@ function playTicTacToe(player1, player2) {
       return GAME_RESULT_TIE;
     }
 
-    curPlayer = curPlayer === player1 ? player2 : player1;
+    [curPlayer, otherPlayer] = curPlayer === player1
+      ? [player2, player1]
+      : [player1, player2];
   }
 }
 
