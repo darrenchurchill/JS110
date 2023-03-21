@@ -495,20 +495,16 @@ function playMatch(matchSize = 5, player1, player2) {
 
   while (!matchWinner) {
     console.clear();
-    let gameResult = playTicTacToe(
+    let gameWinner = playTicTacToe(
       ...curOrder,
       matchScoreHeader(player1, player2)
     );
-    if (gameResult === player1) {
-      player1.numWins += 1;
-      curOrder = [player2, player1];
-    } else if (gameResult === player2) {
-      player2.numWins += 1;
-      curOrder = [player1, player2];
-    }
 
-    if (player1.numWins === matchSize) matchWinner = player1;
-    else if (player2.numWins === matchSize) matchWinner = player2;
+    if (gameWinner === GAME_RESULT_TIE) continue;
+
+    gameWinner.numWins += 1;
+    curOrder = gameWinner === player1 ? [player2, player1] : [player1, player2];
+    if (gameWinner.numWins === matchSize) matchWinner = gameWinner;
   }
 
   matchScoreHeader(player1, player2);
