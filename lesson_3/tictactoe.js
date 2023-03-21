@@ -250,15 +250,27 @@ function getComputerSquareChoice(board, playerInfo, otherPlayerInfo) {
 function doUserTurn(board, playerInfo) {
   displayBoard(board);
   let choice = promptPlayerSquareChoice(board);
+  console.clear();
   markBoard(board, choice, playerInfo.mark);
+  return `${playerInfo.name} chooses square ${getSquareNum(choice)}.`;
+}
+
+function sleep(ms) {
+  const date = Date.now();
+  while (true) {
+    let currentDate = Date.now();
+    if (currentDate - date > ms) return;
+  }
 }
 
 function doComputerTurn(board, playerInfo, otherPlayerInfo) {
+  displayBoard(board);
+  displayOutput(`${playerInfo.name} making their choice...`);
   let choice = getComputerSquareChoice(board, playerInfo, otherPlayerInfo);
-  displayOutput(
-    `${playerInfo.name} chooses square ${getSquareNum(choice)}.`
-  );
+  sleep(1000);
+  console.clear();
   markBoard(board, choice, playerInfo.mark);
+  return `${playerInfo.name} chooses square ${getSquareNum(choice)}.`;
 }
 
 /**
@@ -405,42 +417,50 @@ function getWinner(winnerMark, player1, player2) {
 }
 
 function displayWinnerResult(board, winner) {
-  displayOutput('\nWe have a winner!!!');
+  displayOutput('We have a winner!!!');
   displayBoard(board);
   displayOutput(`${winner.name} wins!!!`);
+  readline.question('Press enter to continue.');
 }
 
 function displayTieResult(board) {
   displayOutput("It's a tie.");
   displayBoard(board);
+  readline.question('Press enter to continue.');
 }
 
 // eslint-disable-next-line max-lines-per-function, max-statements
-function playTicTacToe(player1, player2) {
+function playTicTacToe(player1, player2, gameHeader = 'Tic Tac Toe!') {
   let board = initializeBoard();
   let curPlayer = player1;
   let otherPlayer = player2;
+  let gameSubheader = `${curPlayer.name} goes first!`;
 
-  displayOutput(`${curPlayer.name} goes first!`);
+  displayOutput(`${gameHeader}\n`);
+  displayOutput(gameSubheader);
 
   while (true) {
-    curPlayer.gameChoiceCallback(board, curPlayer, otherPlayer);
+    gameSubheader = curPlayer.gameChoiceCallback(board, curPlayer, otherPlayer);
     let curResult = inspectForWinner(board);
 
     if (curResult) {
       let winner = getWinner(curResult, player1, player2);
+      displayOutput(`${gameHeader}\n`);
       displayWinnerResult(board, winner);
       return winner === player1 ? player1 : player2;
     }
 
     if (isBoardFull(board)) {
+      displayOutput(`${gameHeader}\n`);
       displayTieResult(board);
       return GAME_RESULT_TIE;
     }
 
-    [curPlayer, otherPlayer] = curPlayer === player1
-      ? [player2, player1]
-      : [player1, player2];
+    [curPlayer, otherPlayer] =
+      curPlayer === player1 ? [player2, player1] : [player1, player2];
+
+    displayOutput(`${gameHeader}\n`);
+    displayOutput(gameSubheader);
   }
 }
 
@@ -450,12 +470,12 @@ function shouldPlayAgain() {
   return choice === choices[1];
 }
 
-function displayMatchScore(player1, player2) {
-  displayOutput(
-    `\n###### Match Score: `
-    + `${player1.name}: ${player1.numWins} `
-    + `${player2.name}: ${player2.numWins} `
-    + '######\n'
+function matchScoreHeader(player1, player2) {
+  return (
+    `###### Match Score: ` +
+    `${player1.name}: ${player1.numWins} ` +
+    `${player2.name}: ${player2.numWins} ` +
+    '######'
   );
 }
 
@@ -474,9 +494,11 @@ function playMatch(matchSize = 5, player1, player2) {
   let matchWinner = null;
 
   while (!matchWinner) {
-    displayMatchScore(player1, player2);
-    let gameResult = playTicTacToe(...curOrder);
-
+    console.clear();
+    let gameResult = playTicTacToe(
+      ...curOrder,
+      matchScoreHeader(player1, player2)
+    );
     if (gameResult === player1) {
       player1.numWins += 1;
       curOrder = [player2, player1];
@@ -489,7 +511,7 @@ function playMatch(matchSize = 5, player1, player2) {
     else if (player2.numWins === matchSize) matchWinner = player2;
   }
 
-  displayMatchScore(player1, player2);
+  matchScoreHeader(player1, player2);
   displayMatchWinner(matchWinner);
 
   player1.numWins = player1NumWinsOrig;
@@ -599,6 +621,7 @@ function promptConfigureGame() {
 }
 
 function play() {
+  console.clear();
   let [player1, player2] = promptConfigureGame();
 
   while (true) {
