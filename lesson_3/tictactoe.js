@@ -450,11 +450,11 @@ function shouldPlayAgain() {
   return choice === choices[1];
 }
 
-function displayMatchScore(userInfo, computerInfo) {
+function displayMatchScore(player1, player2) {
   displayOutput(
     `\n###### Match Score: `
-    + `${userInfo.name}: ${userInfo.numWins} `
-    + `${computerInfo.name}: ${computerInfo.numWins} `
+    + `${player1.name}: ${player1.numWins} `
+    + `${player2.name}: ${player2.numWins} `
     + '######\n'
   );
 }
