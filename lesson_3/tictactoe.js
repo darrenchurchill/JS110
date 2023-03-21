@@ -18,6 +18,35 @@ function prompt(promptText) {
   return readline.questionInt(promptText);
 }
 
+function promptWithChoices(promptText, choices) {
+  while (true) {
+    let choice = readline.question(
+      `${promptText.trim()} ` +
+        `[${choices[0]} (default)` +
+        `${choices.length > 1 ? ' | ' : ''}` +
+        `${choices.slice(1).join(' | ')}] `
+    );
+    // Default to the first choice if the user chooses nothing
+    if (choice === '') return choices[0];
+
+    choice = getUnambiguousChoice(choices, choice);
+    if (choice !== '') return choice;
+    displayOutput('Invalid choice.');
+  }
+}
+
+function getUnambiguousChoice(choices, choice) {
+  let shortenedChoices = choices.map(
+    (str) => str.slice(0, choice.length).toLowerCase()
+  );
+
+  let idx = shortenedChoices.indexOf(choice.toLowerCase());
+  let lastIdx = shortenedChoices.lastIndexOf(choice.toLowerCase());
+  if (idx >= 0 && idx === lastIdx) return choices[idx];
+
+  return '';
+}
+
 function displayOutput(output) {
   console.log(output);
 }
@@ -416,8 +445,9 @@ function playTicTacToe(player1, player2) {
 }
 
 function shouldPlayAgain() {
-  let input = readline.question('Play Again? [yN] ');
-  return input.toLowerCase() === 'y';
+  let choices = ['no', 'yes'];
+  let choice = promptWithChoices('Play again?', choices);
+  return choice === choices[1];
 }
 
 function displayMatchScore(userInfo, computerInfo) {
@@ -507,21 +537,18 @@ function promptUserName(defaultName) {
 
 function promptUserType(defaultUserType = GAME_PLAYER_TYPE_USER) {
   let otherUserType;
-  let defaultTypeStr;
+  let choices = ['user', 'computer'];
 
   if (defaultUserType === GAME_PLAYER_TYPE_USER) {
     otherUserType = GAME_PLAYER_TYPE_COMPUTER;
-    defaultTypeStr = 'U';
   } else {
     otherUserType = GAME_PLAYER_TYPE_USER;
-    defaultTypeStr = 'C';
+    choices = [choices[1], choices[0]];
   }
 
-  let type = readline.question(`User type? (user/computer) [${defaultTypeStr}] `);
+  let type = promptWithChoices('User type?', choices);
 
-  return type === '' || type.toUpperCase() === defaultTypeStr
-    ? defaultUserType
-    : otherUserType;
+  return type === choices[0] ? defaultUserType : otherUserType;
 }
 
 function promptConfigureUser(userNum, defaultUserType, otherUser) {
@@ -546,18 +573,11 @@ function promptConfigureUser(userNum, defaultUserType, otherUser) {
 }
 
 function promptPlayerOrder(player1, player2) {
-  const choices = [1, 2, 3];
-  displayOutput(`Which player should go first? `
-                + `${player1.name}: ${choices[0]} | `
-                + `${player2.name}: ${choices[1]} | `
-                + `random: ${choices[2]}`);
-
-  let choice;
-  while (true) {
-    choice = prompt('> ');
-    if (choices.includes(choice)) break;
-    displayOutput('Invalid choice.');
-  }
+  let choices = [player1.name, player2.name, 'random'];
+  let choice = promptWithChoices(
+    'Which player should go first?',
+    choices
+  );
 
   if (choice === choices[0]) return [player1, player2];
   if (choice === choices[1]) return [player2, player1];
