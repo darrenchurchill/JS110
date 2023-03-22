@@ -6,7 +6,7 @@
  *
  * A command-line tic tac toe game against the computer
  */
-const BOARD_SIZE = 3;
+const DEFAULT_BOARD_SIZE = 3;
 const GAME_RESULT_TIE = 0;
 const GAME_PLAYER_TYPE_USER = 0;
 const GAME_PLAYER_TYPE_COMPUTER = 1;
@@ -53,20 +53,20 @@ function displayOutput(output) {
 
 function displayBoard(board) {
   // TODO: make this nicer looking
-  for (let i = 0; i < BOARD_SIZE; i++) {
-    let rowStart = i * BOARD_SIZE;
+  for (let i = 0; i < Math.sqrt(board.length); i++) {
+    let rowStart = i * Math.sqrt(board.length);
     console.log(getRowSlice(board, rowStart));
   }
 }
 
-function* genRowStartIndexes() {
-  for (let i = 0; i < BOARD_SIZE ** 2; i += BOARD_SIZE) {
+function* genRowStartIndexes(board) {
+  for (let i = 0; i < board.length; i += Math.sqrt(board.length)) {
     yield i;
   }
 }
 
-function* genColStartIndexes() {
-  for (let i = 0; i < BOARD_SIZE; i++) {
+function* genColStartIndexes(board) {
+  for (let i = 0; i < Math.sqrt(board.length); i++) {
     yield i;
   }
 }
@@ -81,48 +81,48 @@ function getBoardSlice(board, sliceGenerator) {
   return [...sliceGenerator].map((idx) => board[idx]);
 }
 
-function* genRowIndexes(rowStart) {
-  for (let i = rowStart; i < rowStart + BOARD_SIZE; i++) {
+function* genRowIndexes(board, rowStart) {
+  for (let i = rowStart; i < rowStart + Math.sqrt(board.length); i++) {
     yield i;
   }
 }
 
 function getRowSlice(board, rowStart) {
-  return getBoardSlice(board, genRowIndexes(rowStart));
+  return getBoardSlice(board, genRowIndexes(board, rowStart));
 }
 
-function* genColIndexes(colStart) {
-  for (let i = colStart; i < BOARD_SIZE ** 2; i += BOARD_SIZE) {
+function* genColIndexes(board, colStart) {
+  for (let i = colStart; i < board.length; i += Math.sqrt(board.length)) {
     yield i;
   }
 }
 
 function getColSlice(board, colStart) {
-  return getBoardSlice(board, genColIndexes(colStart));
+  return getBoardSlice(board, genColIndexes(board, colStart));
 }
 
-function* genDiagonalIndexesTopLeftToBottomRight() {
+function* genDiagonalIndexesTopLeftToBottomRight(board) {
   let curIdx = 0;
 
-  while (curIdx < BOARD_SIZE ** 2) {
+  while (curIdx < board.length) {
     yield curIdx;
-    curIdx += BOARD_SIZE + 1;
+    curIdx += Math.sqrt(board.length) + 1;
   }
 }
 
-function* genDiagonalIndexesTopRightToBottomLeft() {
-  let curIdx = BOARD_SIZE - 1;
+function* genDiagonalIndexesTopRightToBottomLeft(board) {
+  let curIdx = Math.sqrt(board.length) - 1;
 
-  while (curIdx < (BOARD_SIZE ** 2) - 1) {
+  while (curIdx < board.length - 1) {
     yield curIdx;
-    curIdx += BOARD_SIZE - 1;
+    curIdx += Math.sqrt(board.length) - 1;
   }
 }
 
-function initializeBoard() {
+function initializeBoard(boardSize) {
   let board = [];
 
-  for (let i = 0; i < BOARD_SIZE ** 2; i++) {
+  for (let i = 0; i < boardSize ** 2; i++) {
     board[i] = EMPTY_SQUARE;
   }
 
@@ -157,12 +157,12 @@ function isEmptySquare(square) {
   return square === EMPTY_SQUARE;
 }
 
-function isInBounds(idx) {
-  return idx >= 0 && idx < BOARD_SIZE ** 2;
+function isInBounds(board, idx) {
+  return idx >= 0 && idx < board.length;
 }
 
 function isValidMove(board, idx) {
-  return isInBounds(idx) && isEmptySquareAt(board, idx);
+  return isInBounds(board, idx) && isEmptySquareAt(board, idx);
 }
 
 function isBoardFull(board) {
@@ -236,8 +236,8 @@ function getComputerSquareChoice(board, playerInfo, otherPlayerInfo) {
   if (atRiskSquareIdx >= 0) return atRiskSquareIdx;
 
   // Pick middle square if there is a middle square and it's empty
-  if (BOARD_SIZE % 2 === 1) {
-    let midIdx = Math.floor((BOARD_SIZE ** 2) / 2);
+  if (board.length % 2 === 1) {
+    let midIdx = Math.floor(board.length / 2);
     if (isEmptySquareAt(board, midIdx)) return midIdx;
   }
 
@@ -314,11 +314,16 @@ function inspectCol(board, colStartIdx) {
  * winner.
  */
 function inspectDiagonals(board) {
-  let squares = getBoardSlice(board, genDiagonalIndexesTopLeftToBottomRight());
+  let squares = getBoardSlice(
+    board,
+    genDiagonalIndexesTopLeftToBottomRight(board)
+  );
+
   let result = inspect(squares);
   if (result) return result;
 
-  squares = getBoardSlice(board, genDiagonalIndexesTopRightToBottomLeft());
+  squares = getBoardSlice(board, genDiagonalIndexesTopRightToBottomLeft(board));
+
   return inspect(squares);
 }
 
@@ -329,12 +334,12 @@ function inspectDiagonals(board) {
  * winner.
  */
 function inspectForWinner(board) {
-  for (let rowStartIdx of genRowStartIndexes()) {
+  for (let rowStartIdx of genRowStartIndexes(board)) {
     let result = inspectRow(board, rowStartIdx);
     if (result) return result;
   }
 
-  for (let colStartIdx of genColStartIndexes()) {
+  for (let colStartIdx of genColStartIndexes(board)) {
     let result = inspectCol(board, colStartIdx);
     if (result) return result;
   }
@@ -363,14 +368,16 @@ function findAtRiskSquareIndexOfIndexSlice(board, squareIndexes, playerMark) {
 }
 
 function findAtRiskSquareIndexOfRow(board, rowStartIdx, playerMark) {
-  let squareIndexes = [...genRowIndexes(rowStartIdx)];
+  let squareIndexes = [...genRowIndexes(board, rowStartIdx)];
+
   if (hasOtherPlayerMark(board, squareIndexes, playerMark)) return -1;
 
   return indexOfSingleEmptySquare(board, squareIndexes);
 }
 
 function findAtRiskSquareIndexOfCol(board, colStartIdx, playerMark) {
-  let squareIndexes = [...genColIndexes(colStartIdx)];
+  let squareIndexes = [...genColIndexes(board, colStartIdx)];
+
   if (hasOtherPlayerMark(board, squareIndexes, playerMark)) return -1;
 
   return indexOfSingleEmptySquare(board, squareIndexes);
@@ -380,7 +387,7 @@ function findAtRiskSquareIndexOfCol(board, colStartIdx, playerMark) {
 function findAtRiskSquareIndex(board, playerMark) {
   let atRiskSquareIdx = -1;
 
-  for (let rowStartIdx of genRowStartIndexes()) {
+  for (let rowStartIdx of genRowStartIndexes(board)) {
     atRiskSquareIdx = findAtRiskSquareIndexOfRow(
       board,
       rowStartIdx,
@@ -389,7 +396,7 @@ function findAtRiskSquareIndex(board, playerMark) {
     if (atRiskSquareIdx >= 0) return atRiskSquareIdx;
   }
 
-  for (let colStartIdx of genColStartIndexes()) {
+  for (let colStartIdx of genColStartIndexes(board)) {
     atRiskSquareIdx = findAtRiskSquareIndexOfCol(
       board,
       colStartIdx,
@@ -400,14 +407,14 @@ function findAtRiskSquareIndex(board, playerMark) {
 
   atRiskSquareIdx = findAtRiskSquareIndexOfIndexSlice(
     board,
-    [...genDiagonalIndexesTopLeftToBottomRight()],
+    [...genDiagonalIndexesTopLeftToBottomRight(board)],
     playerMark
   );
   if (atRiskSquareIdx >= 0) return atRiskSquareIdx;
 
   return findAtRiskSquareIndexOfIndexSlice(
     board,
-    [...genDiagonalIndexesTopRightToBottomLeft()],
+    [...genDiagonalIndexesTopRightToBottomLeft(board)],
     playerMark
   );
 }
@@ -431,7 +438,7 @@ function displayTieResult(board) {
 
 // eslint-disable-next-line max-lines-per-function, max-statements
 function playTicTacToe(player1, player2, gameHeader = 'Tic Tac Toe!') {
-  let board = initializeBoard();
+  let board = initializeBoard(DEFAULT_BOARD_SIZE);
   let curPlayer = player1;
   let otherPlayer = player2;
   let gameSubheader = `${curPlayer.name} goes first!`;
