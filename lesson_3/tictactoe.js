@@ -7,6 +7,8 @@
  * A command-line tic tac toe game against the computer
  */
 const DEFAULT_BOARD_SIZE = 3;
+const MIN_BOARD_SIZE = 3;
+const MAX_BOARD_SIZE = 8;
 const GAME_RESULT_TIE = 0;
 const GAME_PLAYER_TYPE_USER = 0;
 const GAME_PLAYER_TYPE_COMPUTER = 1;
@@ -437,8 +439,13 @@ function displayTieResult(board) {
 }
 
 // eslint-disable-next-line max-lines-per-function, max-statements
-function playTicTacToe(player1, player2, gameHeader = 'Tic Tac Toe!') {
-  let board = initializeBoard(DEFAULT_BOARD_SIZE);
+function playTicTacToe(
+  boardSize,
+  player1,
+  player2,
+  gameHeader = 'Tic Tac Toe!'
+) {
+  let board = initializeBoard(boardSize);
   let curPlayer = player1;
   let otherPlayer = player2;
   let gameSubheader = `${curPlayer.name} goes first!`;
@@ -492,7 +499,7 @@ function displayMatchWinner(winnerInfo) {
 }
 
 // eslint-disable-next-line max-lines-per-function, max-statements
-function playMatch(matchSize = 5, player1, player2) {
+function playMatch(matchSize = 5, boardSize, player1, player2) {
   let player1NumWinsOrig = player1.numWins;
   let player2NumWinsOrig = player2.numWins;
   player1.numWins = 0;
@@ -503,6 +510,7 @@ function playMatch(matchSize = 5, player1, player2) {
   while (!matchWinner) {
     console.clear();
     let gameWinner = playTicTacToe(
+      boardSize,
       ...curOrder,
       matchScoreHeader(player1, player2)
     );
@@ -519,6 +527,17 @@ function playMatch(matchSize = 5, player1, player2) {
 
   player1.numWins = player1NumWinsOrig;
   player2.numWins = player2NumWinsOrig;
+}
+
+function promptBoardSize(defaultSize = DEFAULT_BOARD_SIZE) {
+  let choices = [...Array(MAX_BOARD_SIZE).keys()].map((el) => String(el + 1));
+
+  choices = choices.slice(choices.indexOf(`${MIN_BOARD_SIZE}`));
+  choices = choices
+    .splice(choices.indexOf(`${defaultSize}`), 1)
+    .concat(choices);
+
+  return promptWithChoices('How wide should the board be?', choices);
 }
 
 /**
@@ -615,20 +634,26 @@ function promptPlayerOrder(player1, player2) {
 function promptConfigureGame() {
   // TODO: add board size to this configuration prompt
   // TODO: add match number of games to this configuration prompt
+  let boardSize = promptBoardSize(DEFAULT_BOARD_SIZE);
+
   let player1 = promptConfigureUser(1, GAME_PLAYER_TYPE_USER);
   let player2 = promptConfigureUser(2, GAME_PLAYER_TYPE_COMPUTER, player1);
 
   [player1, player2] = promptPlayerOrder(player1, player2);
 
-  return [player1, player2];
+  return {
+    boardSize: boardSize,
+    players: [player1, player2],
+  };
 }
 
 function play() {
   console.clear();
-  let [player1, player2] = promptConfigureGame();
+  let game = promptConfigureGame();
 
   while (true) {
-    playMatch(5, player1, player2);
+    playMatch(5, game.boardSize, ...game.players);
+
     if (!shouldPlayAgain()) return;
   }
 }
