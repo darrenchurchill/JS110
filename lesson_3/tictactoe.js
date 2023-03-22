@@ -7,6 +7,8 @@
  * A command-line tic tac toe game against the computer
  */
 const DEFAULT_BOARD_SIZE = 3;
+const DEFAULT_NUM_GAMES_PER_MATCH = 5;
+const DEFAULT_MAX_GAMES_PER_MATCH = 7;
 const MIN_BOARD_SIZE = 3;
 const MAX_BOARD_SIZE = 8;
 const GAME_RESULT_TIE = 0;
@@ -529,15 +531,31 @@ function playMatch(matchSize = 5, boardSize, player1, player2) {
   player2.numWins = player2NumWinsOrig;
 }
 
+function genIntegerChoicesList(minChoice, maxChoice, defaultChoice) {
+  let choices = [...Array(maxChoice).keys()].map((el) => String(el + 1));
+  choices = choices.slice(choices.indexOf(`${minChoice}`));
+  return choices.splice(choices.indexOf(`${defaultChoice}`), 1).concat(choices);
+}
+
 function promptBoardSize(defaultSize = DEFAULT_BOARD_SIZE) {
-  let choices = [...Array(MAX_BOARD_SIZE).keys()].map((el) => String(el + 1));
-
-  choices = choices.slice(choices.indexOf(`${MIN_BOARD_SIZE}`));
-  choices = choices
-    .splice(choices.indexOf(`${defaultSize}`), 1)
-    .concat(choices);
-
+  let choices = genIntegerChoicesList(
+    MIN_BOARD_SIZE,
+    MAX_BOARD_SIZE,
+    defaultSize
+  );
   return promptWithChoices('How wide should the board be?', choices);
+}
+
+function promptNumGamesPerMatch(defaultNumGames = DEFAULT_NUM_GAMES_PER_MATCH) {
+  let choices = genIntegerChoicesList(
+    1,
+    DEFAULT_MAX_GAMES_PER_MATCH,
+    defaultNumGames
+  );
+  return promptWithChoices(
+    'How many games per match would you like to play?',
+    choices
+  );
 }
 
 /**
@@ -635,6 +653,7 @@ function promptConfigureGame() {
   // TODO: add board size to this configuration prompt
   // TODO: add match number of games to this configuration prompt
   let boardSize = promptBoardSize(DEFAULT_BOARD_SIZE);
+  let numGamesPerMatch = promptNumGamesPerMatch(DEFAULT_NUM_GAMES_PER_MATCH);
 
   let player1 = promptConfigureUser(1, GAME_PLAYER_TYPE_USER);
   let player2 = promptConfigureUser(2, GAME_PLAYER_TYPE_COMPUTER, player1);
@@ -642,6 +661,7 @@ function promptConfigureGame() {
   [player1, player2] = promptPlayerOrder(player1, player2);
 
   return {
+    numGamesPerMatch: numGamesPerMatch,
     boardSize: boardSize,
     players: [player1, player2],
   };
@@ -652,7 +672,7 @@ function play() {
   let game = promptConfigureGame();
 
   while (true) {
-    playMatch(5, game.boardSize, ...game.players);
+    playMatch(game.numGamesPerMatch, game.boardSize, ...game.players);
 
     if (!shouldPlayAgain()) return;
   }
