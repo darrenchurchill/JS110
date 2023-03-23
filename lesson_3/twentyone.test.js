@@ -11,7 +11,7 @@ const twentyone = require('./twentyone');
 
 describe('test deck initialization', () => {
   it('should have the correct total number of cards', () => {
-    expect(twentyone.createDeck().length).toBe(
+    expect(twentyone.createDeck()).toHaveLength(
       (twentyone.NUMBER_CARDS.length
         + twentyone.FACE_CARDS_REGULAR.length
         + twentyone.FACE_CARDS_SPECIAL.length)
@@ -23,7 +23,7 @@ describe('test deck initialization', () => {
     let deck = twentyone.createDeck();
     twentyone.SUITS.forEach((suit) => {
       let filtered = deck.filter((card) => card.suit === suit);
-      expect(filtered.length).toBe(deck.length / twentyone.SUITS.length);
+      expect(filtered).toHaveLength(deck.length / twentyone.SUITS.length);
     });
   });
 
@@ -54,8 +54,8 @@ describe('test suit initialization', () => {
     for (let suit of twentyone.SUITS) {
       let cards = twentyone.createSuit(suit);
       for (let card of cards) {
-        expect(cards.filter((fCard) => fCard.name === card.name).length)
-          .toBe(1);
+        expect(cards.filter((fCard) => fCard.name === card.name))
+          .toHaveLength(1);
       }
     }
   });
