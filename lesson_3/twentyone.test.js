@@ -47,6 +47,29 @@ describe('test deck initialization', () => {
       expect(count.num).toBe(first.num);
     });
   });
+
+  it('should contain cards with the correct value, according to their name', () => {
+    for (let card of twentyone.createDeck()) {
+      if (twentyone.FACE_CARDS_SPECIAL.includes(card.name)) {
+        expect(card.value).toBe(twentyone.FACE_CARDS_SPECIAL_VALUE);
+      } else if (twentyone.FACE_CARDS_REGULAR.includes(card.name)) {
+        expect(card.value).toBe(twentyone.FACE_CARDS_REGULAR_VALUE);
+      } else {
+        expect(card.value).toBe(Number(card.name));
+      }
+    }
+  });
+
+  it('should contain cards with value === altValue, except for special cards', () => {
+    for (let card of twentyone.createDeck()) {
+      if (twentyone.FACE_CARDS_SPECIAL.includes(card.name)) {
+        expect(card.value).toBe(twentyone.FACE_CARDS_SPECIAL_VALUE);
+        expect(card.altValue).toBe(twentyone.FACE_CARDS_SPECIAL_ALT_VALUE);
+      } else {
+        expect(card.value).toBe(card.altValue);
+      }
+    }
+  });
 });
 
 describe('test suit initialization', () => {
