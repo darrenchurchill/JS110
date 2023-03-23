@@ -13,16 +13,22 @@ const FACE_CARDS_REGULAR = ['jack', 'queen', 'king'];
 const FACE_CARDS_SPECIAL = ['ace'];
 const SUITS = ['clubs', 'hearts', 'spades', 'diamonds'];
 
+const FACE_CARDS_REGULAR_VALUE = 10;
+const FACE_CARDS_SPECIAL_VALUE = 11;
+const FACE_CARDS_SPECIAL_ALT_VALUE = 1;
+
 
 function createCard(name, suit) {
   let value = Number(name);
-  if (FACE_CARDS_REGULAR.includes(name)) value = 10;
-  else if (FACE_CARDS_SPECIAL.includes(name)) value = 11;
+  if (FACE_CARDS_REGULAR.includes(name)) value = FACE_CARDS_REGULAR_VALUE;
+  else if (FACE_CARDS_SPECIAL.includes(name)) value = FACE_CARDS_SPECIAL_VALUE;
 
   return {
     name: name,
     value: value,
-    altValue: FACE_CARDS_SPECIAL.includes(name) ? 1 : value,
+    altValue: FACE_CARDS_SPECIAL.includes(name)
+      ? FACE_CARDS_SPECIAL_ALT_VALUE
+      : value,
     suit: suit,
   };
 }
@@ -45,6 +51,9 @@ module.exports = {
   FACE_CARDS_REGULAR,
   FACE_CARDS_SPECIAL,
   SUITS,
+  FACE_CARDS_REGULAR_VALUE,
+  FACE_CARDS_SPECIAL_VALUE,
+  FACE_CARDS_SPECIAL_ALT_VALUE,
   createCard,
   createSuit,
   createDeck,
