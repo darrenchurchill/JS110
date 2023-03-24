@@ -42,8 +42,21 @@ function createDeck() {
   return SUITS.flatMap((suit) => createSuit(suit));
 }
 
+function shuffle(deck) {
+  let endIdx = deck.length;
+
+  while (endIdx > 0) {
+    let randIdx = Math.floor(Math.random() * endIdx);
+    endIdx -= 1;
+
+    [deck[randIdx], deck[endIdx]] = [deck[endIdx], deck[randIdx]];
+  }
+
+  return deck;
+}
+
 if (require.main === module) {
-  console.log(createDeck());
+  console.log(shuffle(createDeck()));
 }
 
 module.exports = {
@@ -57,4 +70,5 @@ module.exports = {
   createCard,
   createSuit,
   createDeck,
+  shuffle,
 };
