@@ -83,3 +83,32 @@ describe('test suit initialization', () => {
     }
   });
 });
+
+describe('creating players', () => {
+  it('should throw an exception for invalid player types', () => {
+    expect(() => {
+      twentyone.createPlayer('player name', undefined);
+    }).toThrow(RangeError);
+    expect(() => {
+      twentyone.createPlayer('player name', -1);
+    }).toThrow(RangeError);
+  });
+
+  it('should have the correct properties', () => {
+    let player = twentyone.createPlayer(
+      'player name',
+      twentyone.PLAYER_TYPE_PLAYER
+    );
+    expect(player).toHaveProperty('name', 'player name');
+    expect(player).toHaveProperty('playerType', twentyone.PLAYER_TYPE_PLAYER);
+    expect(player).toHaveProperty('doTurnCallback', twentyone.doPlayerTurn);
+
+    let dealer = twentyone.createPlayer(
+      'dealer name',
+      twentyone.PLAYER_TYPE_DEALER
+    );
+    expect(dealer).toHaveProperty('name', 'dealer name');
+    expect(dealer).toHaveProperty('playerType', twentyone.PLAYER_TYPE_DEALER);
+    expect(dealer).toHaveProperty('doTurnCallback', twentyone.doDealerTurn);
+  });
+});

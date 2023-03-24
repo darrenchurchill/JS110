@@ -17,6 +17,9 @@ const FACE_CARDS_REGULAR_VALUE = 10;
 const FACE_CARDS_SPECIAL_VALUE = 11;
 const FACE_CARDS_SPECIAL_ALT_VALUE = 1;
 
+const PLAYER_TYPE_PLAYER = 0;
+const PLAYER_TYPE_DEALER = 1;
+
 
 function createCard(name, suit) {
   let value = Number(name);
@@ -55,6 +58,30 @@ function shuffle(deck) {
   return deck;
 }
 
+function doPlayerTurn(playerInfo) {
+
+}
+
+function doDealerTurn(dealerInfo) {
+
+}
+
+function createPlayer(name, playerType) {
+  if (playerType !== PLAYER_TYPE_PLAYER && playerType !== PLAYER_TYPE_DEALER) {
+    throw new RangeError(
+      `The playerType arg must be === ` +
+      `PLAYER_TYPE_PLAYER (${PLAYER_TYPE_PLAYER}) ` +
+      `or === PLAYER_TYPE_DEALER (${PLAYER_TYPE_DEALER})`
+    );
+  }
+  return {
+    name: name,
+    playerType: playerType,
+    doTurnCallback:
+      playerType === PLAYER_TYPE_PLAYER ? doPlayerTurn : doDealerTurn,
+  };
+}
+
 if (require.main === module) {
   console.log(shuffle(createDeck()));
 }
@@ -67,8 +94,13 @@ module.exports = {
   FACE_CARDS_REGULAR_VALUE,
   FACE_CARDS_SPECIAL_VALUE,
   FACE_CARDS_SPECIAL_ALT_VALUE,
+  PLAYER_TYPE_PLAYER,
+  PLAYER_TYPE_DEALER,
   createCard,
   createSuit,
   createDeck,
   shuffle,
+  doPlayerTurn,
+  doDealerTurn,
+  createPlayer,
 };
