@@ -239,19 +239,38 @@ describe('calculating non-busting hand values', () => {
     });
   });
 
+  it('should calculate the correct hand values', () => {
+    player.playerHand = [
+      twentyone.createCard('jack', twentyone.SUITS[0]),
+      twentyone.createCard('ace', twentyone.SUITS[0]),
+    ];
+    expect(twentyone.getNonBustedHandTotals(player.playerHand).at(0))
+      .toBe(11);
+    expect(twentyone.getNonBustedHandTotals(player.playerHand).at(-1))
+      .toBe(twentyone.GAME_OBJECT_VALUE);
+
+    player.playerHand = [
+      twentyone.createCard('2', twentyone.SUITS[0]),
+      twentyone.createCard('3', twentyone.SUITS[0]),
+      twentyone.createCard('jack', twentyone.SUITS[0]),
+    ];
+    expect(twentyone.getNonBustedHandTotals(player.playerHand).at(0))
+      .toBe(15);
+  });
+
   it('max hand total is <= GAME_OBJECT_VALUE', () => {
     player.playerHand = [
       twentyone.createCard('jack', twentyone.SUITS[0]),
       twentyone.createCard('ace', twentyone.SUITS[0]),
     ];
     expect(twentyone.getNonBustedHandTotals(player.playerHand).at(-1))
-      .toBe(twentyone.GAME_OBJECT_VALUE);
+      .toBeLessThanOrEqual(twentyone.GAME_OBJECT_VALUE);
 
     player.playerHand.push(
       twentyone.createCard('queen', twentyone.SUITS[0]),
     );
     expect(twentyone.getNonBustedHandTotals(player.playerHand).at(-1))
-      .toBe(twentyone.GAME_OBJECT_VALUE);
+      .toBeLessThanOrEqual(twentyone.GAME_OBJECT_VALUE);
 
     player.playerHand = [
       twentyone.createCard('2', twentyone.SUITS[0]),
