@@ -101,6 +101,7 @@ describe('creating players', () => {
     );
     expect(player).toHaveProperty('name', 'player name');
     expect(player).toHaveProperty('playerType', twentyone.PLAYER_TYPE_PLAYER);
+    expect(player).toHaveProperty('playerHand', []);
     expect(player).toHaveProperty('doTurnCallback', twentyone.doPlayerTurn);
 
     let dealer = twentyone.createPlayer(
@@ -109,6 +110,7 @@ describe('creating players', () => {
     );
     expect(dealer).toHaveProperty('name', 'dealer name');
     expect(dealer).toHaveProperty('playerType', twentyone.PLAYER_TYPE_DEALER);
+    expect(dealer).toHaveProperty('playerHand', []);
     expect(dealer).toHaveProperty('doTurnCallback', twentyone.doDealerTurn);
   });
 });

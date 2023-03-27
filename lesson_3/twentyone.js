@@ -77,6 +77,7 @@ function createPlayer(name, playerType) {
   return {
     name: name,
     playerType: playerType,
+    playerHand: [],
     doTurnCallback:
       playerType === PLAYER_TYPE_PLAYER ? doPlayerTurn : doDealerTurn,
   };
