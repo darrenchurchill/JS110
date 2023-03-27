@@ -133,4 +133,10 @@ describe('dealing cards', () => {
     expect(player.playerHand).toHaveLength(playerHandSizeOrig + 1);
     expect(deck).toHaveLength(deckSizeOrig - 1);
   });
+
+  it('everyone should be dealt the initial hand size to begin', () => {
+    twentyone.dealInitialHands(deck, player, dealer);
+    expect(player.playerHand).toHaveLength(twentyone.INITIAL_HAND_SIZE);
+    expect(dealer.playerHand).toHaveLength(twentyone.INITIAL_HAND_SIZE);
+  });
 });

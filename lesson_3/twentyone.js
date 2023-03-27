@@ -19,6 +19,7 @@ const FACE_CARDS_SPECIAL_ALT_VALUE = 1;
 
 const PLAYER_TYPE_PLAYER = 0;
 const PLAYER_TYPE_DEALER = 1;
+const INITIAL_HAND_SIZE = 2;
 
 
 function createCard(name, suit) {
@@ -70,6 +71,13 @@ function dealCard(deck, player) {
   player.playerHand.push(deck.shift());
 }
 
+function dealInitialHands(deck, player, dealer) {
+  for (let _ = 0; _ < INITIAL_HAND_SIZE; _++) {
+    dealCard(deck, player);
+    dealCard(deck, dealer);
+  }
+}
+
 function createPlayer(name, playerType) {
   if (playerType !== PLAYER_TYPE_PLAYER && playerType !== PLAYER_TYPE_DEALER) {
     throw new RangeError(
@@ -101,6 +109,7 @@ module.exports = {
   FACE_CARDS_SPECIAL_ALT_VALUE,
   PLAYER_TYPE_PLAYER,
   PLAYER_TYPE_DEALER,
+  INITIAL_HAND_SIZE,
   createCard,
   createSuit,
   createDeck,
@@ -108,5 +117,6 @@ module.exports = {
   doPlayerTurn,
   doDealerTurn,
   dealCard,
+  dealInitialHands,
   createPlayer,
 };
