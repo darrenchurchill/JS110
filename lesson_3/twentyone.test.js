@@ -8,14 +8,25 @@
 
 const twentyone = require('./twentyone');
 
+let deck;
+let player;
+let dealer;
+
+beforeEach(() => {
+  deck = twentyone.createDeck();
+
+  player = twentyone.createPlayer(
+    'test player',
+    twentyone.PLAYER_TYPE_PLAYER
+  );
+
+  dealer = twentyone.createPlayer(
+    'test dealer',
+    twentyone.PLAYER_TYPE_DEALER
+  );
+});
 
 describe('test deck initialization', () => {
-  let deck;
-
-  beforeEach(() => {
-    deck = twentyone.createDeck();
-  });
-
   it('should have the correct total number of cards', () => {
     expect(deck).toHaveLength(
       (twentyone.NUMBER_CARDS.length
@@ -99,20 +110,12 @@ describe('creating players', () => {
   });
 
   it('should have the correct properties', () => {
-    let player = twentyone.createPlayer(
-      'player name',
-      twentyone.PLAYER_TYPE_PLAYER
-    );
-    expect(player).toHaveProperty('name', 'player name');
+    expect(player).toHaveProperty('name', 'test player');
     expect(player).toHaveProperty('playerType', twentyone.PLAYER_TYPE_PLAYER);
     expect(player).toHaveProperty('playerHand', []);
     expect(player).toHaveProperty('doTurnCallback', twentyone.doPlayerTurn);
 
-    let dealer = twentyone.createPlayer(
-      'dealer name',
-      twentyone.PLAYER_TYPE_DEALER
-    );
-    expect(dealer).toHaveProperty('name', 'dealer name');
+    expect(dealer).toHaveProperty('name', 'test dealer');
     expect(dealer).toHaveProperty('playerType', twentyone.PLAYER_TYPE_DEALER);
     expect(dealer).toHaveProperty('playerHand', []);
     expect(dealer).toHaveProperty('doTurnCallback', twentyone.doDealerTurn);
@@ -121,10 +124,6 @@ describe('creating players', () => {
 
 describe('dealing cards', () => {
   it('dealing a card should reduce deck size and increase player hand size', () => {
-    let player = twentyone.createPlayer(
-      'test player',
-      twentyone.PLAYER_TYPE_PLAYER
-    );
     let playerHandSizeOrig = player.playerHand.length;
 
     let deck = twentyone.createDeck();
