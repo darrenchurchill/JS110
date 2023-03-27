@@ -26,6 +26,50 @@ beforeEach(() => {
   );
 });
 
+describe('test getting an unambiguous choice from a list of choices', () => {
+  let choices;
+
+  beforeEach(() => {
+    choices = ['hit', 'stay'];
+  });
+
+  it("should return '' when there is no match", () => {
+    expect(twentyone.getUnambiguousChoice(choices, '')).toBe('');
+    expect(twentyone.getUnambiguousChoice(choices, 'zebra')).toBe('');
+    expect(twentyone.getUnambiguousChoice(choices, 'hite')).toBe('');
+    expect(twentyone.getUnambiguousChoice(choices, 'stays')).toBe('');
+  });
+
+  it('should be case-insensitive', () => {
+    expect(twentyone.getUnambiguousChoice(choices, 'Hit')).toBe('hit');
+    expect(twentyone.getUnambiguousChoice(choices, 'HiT')).toBe('hit');
+    expect(twentyone.getUnambiguousChoice(choices, 'STay')).toBe('stay');
+    expect(twentyone.getUnambiguousChoice(choices, 'stAy')).toBe('stay');
+  });
+
+  it('should match partial words when there is only one match', () => {
+    expect(twentyone.getUnambiguousChoice(choices, 'H')).toBe('hit');
+    expect(twentyone.getUnambiguousChoice(choices, 'st')).toBe('stay');
+  });
+
+  describe('when one choice is a substring of another choice', () => {
+    beforeEach(() => {
+      choices = ['yellow', 'yell'];
+    });
+
+    it('should NOT match partial words when there is more than one match', () => {
+      expect(twentyone.getUnambiguousChoice(choices, 'yel')).toBe('');
+      expect(twentyone.getUnambiguousChoice(choices, 'yello')).toBe('yellow');
+      expect(twentyone.getUnambiguousChoice(choices, 'yEllo')).toBe('yellow');
+    });
+
+    it('should match whole words when one choice is a substring of another', () => {
+      expect(twentyone.getUnambiguousChoice(choices, 'yell')).toBe('yell');
+      expect(twentyone.getUnambiguousChoice(choices, 'yellow')).toBe('yellow');
+    });
+  });
+});
+
 describe('test deck initialization', () => {
   it('should have the correct total number of cards', () => {
     expect(deck).toHaveLength(

@@ -7,6 +7,7 @@
  * A command-line game of Twenty-One (simplified BlackJack)
  *
  */
+const readline = require('readline-sync');
 
 const NUMBER_CARDS = ['2', '3', '4', '5', '6', '7', '8', '9', '10'];
 const FACE_CARDS_REGULAR = ['jack', 'queen', 'king'];
@@ -21,6 +22,51 @@ const PLAYER_TYPE_PLAYER = 0;
 const PLAYER_TYPE_DEALER = 1;
 const INITIAL_HAND_SIZE = 2;
 const GAME_OBJECT_VALUE = 21;
+
+function prompt(promptText) {
+  return readline.questionInt(promptText);
+}
+
+function promptWithChoices(promptText, choices) {
+  while (true) {
+    let choice = readline.question(
+      `${promptText.trim()} ` +
+        `[${choices[0]} (default)` +
+        `${choices.length > 1 ? ' | ' : ''}` +
+        `${choices.slice(1).join(' | ')}] `
+    );
+    // Default to the first choice if the user chooses nothing
+    if (choice === '') return choices[0];
+
+    choice = getUnambiguousChoice(choices, choice);
+    if (choice !== '') return choice;
+    displayOutput('Invalid choice.');
+  }
+}
+
+function getUnambiguousChoice(choices, choice) {
+  let choicesLower = choices.map((choice) => choice.toLowerCase());
+  let exactMatches = choices.filter(
+    (candidate) => candidate.toLowerCase() === choice.toLowerCase()
+  );
+  if (exactMatches.length === 1) {
+    return choices[choicesLower.indexOf(exactMatches[0])];
+  }
+
+  let shortenedChoices = choices.map(
+    (str) => str.slice(0, choice.length).toLowerCase()
+  );
+
+  let idx = shortenedChoices.indexOf(choice.toLowerCase());
+  let lastIdx = shortenedChoices.lastIndexOf(choice.toLowerCase());
+  if (idx >= 0 && idx === lastIdx) return choices[idx];
+
+  return '';
+}
+
+function displayOutput(output) {
+  console.log(output);
+}
 
 
 function createCard(name, suit) {
@@ -148,6 +194,10 @@ module.exports = {
   PLAYER_TYPE_DEALER,
   INITIAL_HAND_SIZE,
   GAME_OBJECT_VALUE,
+  prompt,
+  promptWithChoices,
+  getUnambiguousChoice,
+  displayOutput,
   createCard,
   createSuit,
   createDeck,
