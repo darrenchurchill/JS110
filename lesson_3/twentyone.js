@@ -97,11 +97,11 @@ function createPlayer(name, playerType) {
   };
 }
 
-function getHandMinTotalValue(playerHand) {
+function getHandMinTotal(playerHand) {
   return playerHand.reduce((accum, card) => accum + card.minValue, 0);
 }
 
-function getHandMaxTotalValue(playerHand) {
+function getHandMaxTotal(playerHand) {
   return playerHand.reduce((accum, card) => accum + card.maxValue, 0);
 }
 
@@ -149,7 +149,7 @@ module.exports = {
   dealCard,
   dealInitialHands,
   createPlayer,
-  getHandMinTotalValue,
-  getHandMaxTotalValue,
+  getHandMinTotal,
+  getHandMaxTotal,
   getHandTotals,
 };

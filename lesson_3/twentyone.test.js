@@ -161,8 +161,8 @@ describe('calculating player hand total values', () => {
 
   describe('when there are no aces', () => {
     it('min hand value === max hand value', () => {
-      expect(twentyone.getHandMinTotalValue(player.playerHand))
-        .toBe(twentyone.getHandMaxTotalValue(player.playerHand));
+      expect(twentyone.getHandMinTotal(player.playerHand))
+        .toBe(twentyone.getHandMaxTotal(player.playerHand));
     });
 
     it('there is only one possible total hand value', () => {
@@ -195,8 +195,8 @@ describe('calculating player hand total values', () => {
       let aceDiff = ace.maxValue - ace.minValue;
 
       expect(
-        twentyone.getHandMaxTotalValue(player.playerHand) -
-          twentyone.getHandMinTotalValue(player.playerHand)
+        twentyone.getHandMaxTotal(player.playerHand) -
+          twentyone.getHandMinTotal(player.playerHand)
       ).toBe(aceDiff * numAces);
     }
   });
@@ -207,7 +207,7 @@ describe('calculating player hand total values', () => {
         twentyone.createCard(twentyone.FACE_CARDS_SPECIAL[0], suit)
       );
     }
-    expect(twentyone.getHandMaxTotalValue(player.playerHand))
+    expect(twentyone.getHandMaxTotal(player.playerHand))
       .toBe(twentyone.getHandTotals(player.playerHand).at(-1));
   });
 });
