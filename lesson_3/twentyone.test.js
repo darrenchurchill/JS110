@@ -99,6 +99,16 @@ describe('test suit initialization', () => {
   });
 });
 
+describe('test card initialization', () => {
+  it('each card should be immutable', () => {
+    expect(() => {
+      "use strict";
+      deck[0].value = -1;
+    }).toThrow(TypeError);
+  });
+
+});
+
 describe('creating players', () => {
   it('should throw an exception for invalid player types', () => {
     expect(() => {

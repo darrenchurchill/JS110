@@ -27,14 +27,14 @@ function createCard(name, suit) {
   if (FACE_CARDS_REGULAR.includes(name)) value = FACE_CARDS_REGULAR_VALUE;
   else if (FACE_CARDS_SPECIAL.includes(name)) value = FACE_CARDS_SPECIAL_VALUE;
 
-  return {
+  return Object.freeze({
     name: name,
     value: value,
     altValue: FACE_CARDS_SPECIAL.includes(name)
       ? FACE_CARDS_SPECIAL_ALT_VALUE
       : value,
     suit: suit,
-  };
+  });
 }
 
 function createSuit(suit) {
