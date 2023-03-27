@@ -66,22 +66,22 @@ describe('test deck initialization', () => {
   it('should contain cards with the correct value, according to their name', () => {
     for (let card of deck) {
       if (twentyone.FACE_CARDS_SPECIAL.includes(card.name)) {
-        expect(card.value).toBe(twentyone.FACE_CARDS_SPECIAL_VALUE);
+        expect(card.minValue).toBe(twentyone.FACE_CARDS_SPECIAL_MIN_VALUE);
       } else if (twentyone.FACE_CARDS_REGULAR.includes(card.name)) {
-        expect(card.value).toBe(twentyone.FACE_CARDS_REGULAR_VALUE);
+        expect(card.minValue).toBe(twentyone.FACE_CARDS_REGULAR_VALUE);
       } else {
-        expect(card.value).toBe(Number(card.name));
+        expect(card.minValue).toBe(Number(card.name));
       }
     }
   });
 
-  it('should contain cards with value === altValue, except for special cards', () => {
+  it('should contain cards with minValue === maxValue, except for special cards', () => {
     for (let card of deck) {
       if (twentyone.FACE_CARDS_SPECIAL.includes(card.name)) {
-        expect(card.value).toBe(twentyone.FACE_CARDS_SPECIAL_VALUE);
-        expect(card.altValue).toBe(twentyone.FACE_CARDS_SPECIAL_ALT_VALUE);
+        expect(card.minValue).toBe(twentyone.FACE_CARDS_SPECIAL_MIN_VALUE);
+        expect(card.maxValue).toBe(twentyone.FACE_CARDS_SPECIAL_MAX_VALUE);
       } else {
-        expect(card.value).toBe(card.altValue);
+        expect(card.minValue).toBe(card.maxValue);
       }
     }
   });
@@ -148,5 +148,36 @@ describe('dealing cards', () => {
     twentyone.dealInitialHands(deck, player, dealer);
     expect(player.playerHand).toHaveLength(twentyone.INITIAL_HAND_SIZE);
     expect(dealer.playerHand).toHaveLength(twentyone.INITIAL_HAND_SIZE);
+  });
+});
+
+describe('calculating player hand total values', () => {
+  beforeEach(() => {
+    player.playerHand = [
+      twentyone.createCard(twentyone.NUMBER_CARDS[0], twentyone.SUITS[0]),
+      twentyone.createCard(twentyone.NUMBER_CARDS[1], twentyone.SUITS[0]),
+    ];
+  });
+
+  it('min hand value === max hand value when there are no aces', () => {
+    expect(twentyone.getHandMinTotalValue(player.playerHand))
+      .toBe(twentyone.getHandMaxTotalValue(player.playerHand));
+  });
+
+  it('max hand value is larger than min hand value by multiple of # aces', () => {
+    let numAces = 0;
+
+    for (let suit of twentyone.SUITS) {
+      let ace = twentyone.createCard(twentyone.FACE_CARDS_SPECIAL[0], suit);
+      player.playerHand.push(ace);
+
+      numAces += 1;
+      let aceDiff = ace.maxValue - ace.minValue;
+
+      expect(
+        twentyone.getHandMaxTotalValue(player.playerHand) -
+          twentyone.getHandMinTotalValue(player.playerHand)
+      ).toBe(aceDiff * numAces);
+    }
   });
 });

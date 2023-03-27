@@ -14,8 +14,8 @@ const FACE_CARDS_SPECIAL = ['ace'];
 const SUITS = ['clubs', 'hearts', 'spades', 'diamonds'];
 
 const FACE_CARDS_REGULAR_VALUE = 10;
-const FACE_CARDS_SPECIAL_VALUE = 11;
-const FACE_CARDS_SPECIAL_ALT_VALUE = 1;
+const FACE_CARDS_SPECIAL_MIN_VALUE = 1;
+const FACE_CARDS_SPECIAL_MAX_VALUE = 11;
 
 const PLAYER_TYPE_PLAYER = 0;
 const PLAYER_TYPE_DEALER = 1;
@@ -25,13 +25,15 @@ const INITIAL_HAND_SIZE = 2;
 function createCard(name, suit) {
   let value = Number(name);
   if (FACE_CARDS_REGULAR.includes(name)) value = FACE_CARDS_REGULAR_VALUE;
-  else if (FACE_CARDS_SPECIAL.includes(name)) value = FACE_CARDS_SPECIAL_VALUE;
+  else if (FACE_CARDS_SPECIAL.includes(name)) {
+    value = FACE_CARDS_SPECIAL_MAX_VALUE;
+  }
 
   return Object.freeze({
     name: name,
-    value: value,
-    altValue: FACE_CARDS_SPECIAL.includes(name)
-      ? FACE_CARDS_SPECIAL_ALT_VALUE
+    maxValue: value,
+    minValue: FACE_CARDS_SPECIAL.includes(name)
+      ? FACE_CARDS_SPECIAL_MIN_VALUE
       : value,
     suit: suit,
   });
@@ -95,6 +97,14 @@ function createPlayer(name, playerType) {
   };
 }
 
+function getHandMinTotalValue(playerHand) {
+  return playerHand.reduce((accum, card) => accum + card.minValue, 0);
+}
+
+function getHandMaxTotalValue(playerHand) {
+  return playerHand.reduce((accum, card) => accum + card.maxValue, 0);
+}
+
 if (require.main === module) {
   console.log(shuffle(createDeck()));
 }
@@ -105,8 +115,8 @@ module.exports = {
   FACE_CARDS_SPECIAL,
   SUITS,
   FACE_CARDS_REGULAR_VALUE,
-  FACE_CARDS_SPECIAL_VALUE,
-  FACE_CARDS_SPECIAL_ALT_VALUE,
+  FACE_CARDS_SPECIAL_MAX_VALUE,
+  FACE_CARDS_SPECIAL_MIN_VALUE,
   PLAYER_TYPE_PLAYER,
   PLAYER_TYPE_DEALER,
   INITIAL_HAND_SIZE,
@@ -119,4 +129,6 @@ module.exports = {
   dealCard,
   dealInitialHands,
   createPlayer,
+  getHandMinTotalValue,
+  getHandMaxTotalValue,
 };
