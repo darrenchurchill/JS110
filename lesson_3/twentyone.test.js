@@ -114,3 +114,20 @@ describe('creating players', () => {
     expect(dealer).toHaveProperty('doTurnCallback', twentyone.doDealerTurn);
   });
 });
+
+describe('dealing cards', () => {
+  it('dealing a card should reduce deck size and increase player hand size', () => {
+    let player = twentyone.createPlayer(
+      'test player',
+      twentyone.PLAYER_TYPE_PLAYER
+    );
+    let playerHandSizeOrig = player.playerHand.length;
+
+    let deck = twentyone.createDeck();
+    let deckSizeOrig = deck.length;
+
+    twentyone.dealCard(deck, player);
+    expect(player.playerHand).toHaveLength(playerHandSizeOrig + 1);
+    expect(deck).toHaveLength(deckSizeOrig - 1);
+  });
+});

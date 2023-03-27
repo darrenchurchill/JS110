@@ -66,6 +66,10 @@ function doDealerTurn(dealerInfo) {
 
 }
 
+function dealCard(deck, player) {
+  player.playerHand.push(deck.shift());
+}
+
 function createPlayer(name, playerType) {
   if (playerType !== PLAYER_TYPE_PLAYER && playerType !== PLAYER_TYPE_DEALER) {
     throw new RangeError(
@@ -103,5 +107,6 @@ module.exports = {
   shuffle,
   doPlayerTurn,
   doDealerTurn,
+  dealCard,
   createPlayer,
 };
