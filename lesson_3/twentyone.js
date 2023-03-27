@@ -20,6 +20,7 @@ const FACE_CARDS_SPECIAL_MAX_VALUE = 11;
 const PLAYER_TYPE_PLAYER = 0;
 const PLAYER_TYPE_DEALER = 1;
 const INITIAL_HAND_SIZE = 2;
+const GAME_OBJECT_VALUE = 21;
 
 
 function createCard(name, suit) {
@@ -125,6 +126,12 @@ function getHandTotals(playerHand) {
   return totalValues;
 }
 
+function getNonBustedHandTotals(playerHand) {
+  return getHandTotals(playerHand).filter(
+    (total) => total <= GAME_OBJECT_VALUE
+  );
+}
+
 if (require.main === module) {
   console.log(shuffle(createDeck()));
 }
@@ -140,6 +147,7 @@ module.exports = {
   PLAYER_TYPE_PLAYER,
   PLAYER_TYPE_DEALER,
   INITIAL_HAND_SIZE,
+  GAME_OBJECT_VALUE,
   createCard,
   createSuit,
   createDeck,
@@ -152,4 +160,5 @@ module.exports = {
   getHandMinTotal,
   getHandMaxTotal,
   getHandTotals,
+  getNonBustedHandTotals,
 };
