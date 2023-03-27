@@ -10,8 +10,14 @@ const twentyone = require('./twentyone');
 
 
 describe('test deck initialization', () => {
+  let deck;
+
+  beforeEach(() => {
+    deck = twentyone.createDeck();
+  });
+
   it('should have the correct total number of cards', () => {
-    expect(twentyone.createDeck()).toHaveLength(
+    expect(deck).toHaveLength(
       (twentyone.NUMBER_CARDS.length
         + twentyone.FACE_CARDS_REGULAR.length
         + twentyone.FACE_CARDS_SPECIAL.length)
@@ -20,7 +26,6 @@ describe('test deck initialization', () => {
   });
 
   it('should have equal number of cards for each suit', () => {
-    let deck = twentyone.createDeck();
     twentyone.SUITS.forEach((suit) => {
       let filtered = deck.filter((card) => card.suit === suit);
       expect(filtered).toHaveLength(deck.length / twentyone.SUITS.length);
@@ -28,7 +33,6 @@ describe('test deck initialization', () => {
   });
 
   it('should have equal number of each type/name of card', () => {
-    let deck = twentyone.createDeck();
     let cardNames = twentyone.NUMBER_CARDS.concat(
       twentyone.FACE_CARDS_REGULAR,
       twentyone.FACE_CARDS_SPECIAL
@@ -49,7 +53,7 @@ describe('test deck initialization', () => {
   });
 
   it('should contain cards with the correct value, according to their name', () => {
-    for (let card of twentyone.createDeck()) {
+    for (let card of deck) {
       if (twentyone.FACE_CARDS_SPECIAL.includes(card.name)) {
         expect(card.value).toBe(twentyone.FACE_CARDS_SPECIAL_VALUE);
       } else if (twentyone.FACE_CARDS_REGULAR.includes(card.name)) {
@@ -61,7 +65,7 @@ describe('test deck initialization', () => {
   });
 
   it('should contain cards with value === altValue, except for special cards', () => {
-    for (let card of twentyone.createDeck()) {
+    for (let card of deck) {
       if (twentyone.FACE_CARDS_SPECIAL.includes(card.name)) {
         expect(card.value).toBe(twentyone.FACE_CARDS_SPECIAL_VALUE);
         expect(card.altValue).toBe(twentyone.FACE_CARDS_SPECIAL_ALT_VALUE);
