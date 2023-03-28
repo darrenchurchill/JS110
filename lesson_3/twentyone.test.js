@@ -334,3 +334,81 @@ describe('calculating non-busting hand values', () => {
     expect(twentyone.getNonBustedHandTotals(player.playerHand)).toHaveLength(0);
   });
 });
+
+describe('doing the dealer turn', () => {
+  describe('should hit until hand total >= DEALER_STAY_VALUE', () => {
+    it('should stay at hand total === DEALER_STAY_VALUE', () => {
+      dealer.playerHand = [
+        twentyone.createCard('5', twentyone.SUITS[0]),
+        twentyone.createCard('2', twentyone.SUITS[0]),
+      ];
+      deck = [
+        twentyone.createCard('10', twentyone.SUITS[0]),
+        twentyone.createCard('2', twentyone.SUITS[0]),
+      ];
+      expect(twentyone.doDealerTurn(deck, dealer))
+        .toBe(twentyone.DEALER_STAY_VALUE);
+
+      dealer.playerHand = [
+        twentyone.createCard('jack', twentyone.SUITS[0]),
+        twentyone.createCard('7', twentyone.SUITS[0]),
+      ];
+      deck = [
+        twentyone.createCard('2', twentyone.SUITS[0]),
+        twentyone.createCard('10', twentyone.SUITS[0]),
+      ];
+      expect(twentyone.doDealerTurn(deck, dealer))
+        .toBe(twentyone.DEALER_STAY_VALUE);
+
+    });
+
+    it('should hit when hand total === DEALER_STAY_VALUE - 1', () => {
+      dealer.playerHand = [
+        twentyone.createCard('10', twentyone.SUITS[0]),
+        twentyone.createCard('6', twentyone.SUITS[0]),
+      ];
+      deck = [
+        twentyone.createCard('2', twentyone.SUITS[0]),
+        twentyone.createCard('10', twentyone.SUITS[0]),
+      ];
+      expect(twentyone.doDealerTurn(deck, dealer))
+        .toBeGreaterThan(twentyone.DEALER_STAY_VALUE);
+
+      dealer.playerHand = [
+        twentyone.createCard('7', twentyone.SUITS[0]),
+        twentyone.createCard('3', twentyone.SUITS[0]),
+      ];
+      deck = [
+        twentyone.createCard('6', twentyone.SUITS[0]),
+        twentyone.createCard('2', twentyone.SUITS[0]),
+      ];
+      expect(twentyone.doDealerTurn(deck, dealer))
+        .toBeGreaterThan(twentyone.DEALER_STAY_VALUE);
+    });
+
+    it('should stay when hand total > DEALER_STAY_VALUE', () => {
+      dealer.playerHand = [
+        twentyone.createCard('10', twentyone.SUITS[0]),
+        twentyone.createCard('jack', twentyone.SUITS[0]),
+      ];
+      deck = [
+        twentyone.createCard('10', twentyone.SUITS[0]),
+      ];
+      expect(twentyone.doDealerTurn(deck, dealer))
+        .toBeGreaterThan(twentyone.DEALER_STAY_VALUE);
+    });
+  });
+
+  it('dealer bust returns GAME_RESULT_PLAYER_BUST', () => {
+    dealer.playerHand = [
+      twentyone.createCard('7', twentyone.SUITS[0]),
+      twentyone.createCard('3', twentyone.SUITS[0]),
+    ];
+    deck = [
+      twentyone.createCard('6', twentyone.SUITS[0]),
+      twentyone.createCard('6', twentyone.SUITS[0]),
+    ];
+    expect(twentyone.doDealerTurn(deck, dealer))
+      .toBe(twentyone.GAME_RESULT_PLAYER_BUST);
+  });
+});

@@ -21,7 +21,9 @@ const FACE_CARDS_SPECIAL_MAX_VALUE = 11;
 const PLAYER_TYPE_PLAYER = 0;
 const PLAYER_TYPE_DEALER = 1;
 const INITIAL_HAND_SIZE = 2;
+const DEALER_STAY_VALUE = 17;
 const GAME_OBJECT_VALUE = 21;
+const GAME_RESULT_PLAYER_BUST = -1;
 
 function prompt(promptText) {
   return readline.questionInt(promptText);
@@ -112,8 +114,19 @@ function doPlayerTurn(playerInfo) {
 
 }
 
-function doDealerTurn(dealerInfo) {
+function shouldDealerHit(dealerInfo) {
+  return getMaxNonBustedHandTotal(dealerInfo.playerHand) < DEALER_STAY_VALUE;
+}
 
+function doDealerTurn(deck, dealerInfo) {
+  while (!isBusted(dealerInfo.playerHand)) {
+    if (!shouldDealerHit(dealerInfo)) {
+      return getMaxNonBustedHandTotal(dealerInfo.playerHand);
+    }
+    dealCard(deck, dealerInfo);
+  }
+
+  return GAME_RESULT_PLAYER_BUST;
 }
 
 function dealCard(deck, player) {
@@ -152,6 +165,10 @@ function getHandMaxTotal(playerHand) {
   return playerHand.reduce((accum, card) => accum + card.maxValue, 0);
 }
 
+function getMaxNonBustedHandTotal(playerHand) {
+  return getNonBustedHandTotals(playerHand).at(-1);
+}
+
 function getHandTotals(playerHand) {
   let normalCards = playerHand.filter((card) =>
     NUMBER_CARDS.includes(card.name) || FACE_CARDS_REGULAR.includes(card.name)
@@ -178,6 +195,10 @@ function getNonBustedHandTotals(playerHand) {
   );
 }
 
+function isBusted(playerHand) {
+  return getNonBustedHandTotals(playerHand).length === 0;
+}
+
 if (require.main === module) {
   console.log(shuffle(createDeck()));
 }
@@ -193,7 +214,9 @@ module.exports = {
   PLAYER_TYPE_PLAYER,
   PLAYER_TYPE_DEALER,
   INITIAL_HAND_SIZE,
+  DEALER_STAY_VALUE,
   GAME_OBJECT_VALUE,
+  GAME_RESULT_PLAYER_BUST,
   prompt,
   promptWithChoices,
   getUnambiguousChoice,
@@ -203,12 +226,15 @@ module.exports = {
   createDeck,
   shuffle,
   doPlayerTurn,
+  shouldDealerHit,
   doDealerTurn,
   dealCard,
   dealInitialHands,
   createPlayer,
   getHandMinTotal,
   getHandMaxTotal,
+  getMaxNonBustedHandTotal,
   getHandTotals,
   getNonBustedHandTotals,
+  isBusted,
 };
