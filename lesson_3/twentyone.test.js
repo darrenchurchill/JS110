@@ -345,13 +345,13 @@ describe('calculating non-busting hand values', () => {
       twentyone.createCard('jack', twentyone.SUITS[0]),
       twentyone.createCard('ace', twentyone.SUITS[0]),
     ];
-    expect(twentyone.getNonBustedHandTotals(player.playerHand).at(-1))
+    expect(twentyone.getMaxNonBustedHandTotal(player.playerHand))
       .toBeLessThanOrEqual(twentyone.GAME_OBJECT_VALUE);
 
     player.playerHand.push(
       twentyone.createCard('queen', twentyone.SUITS[0]),
     );
-    expect(twentyone.getNonBustedHandTotals(player.playerHand).at(-1))
+    expect(twentyone.getMaxNonBustedHandTotal(player.playerHand))
       .toBeLessThanOrEqual(twentyone.GAME_OBJECT_VALUE);
 
     player.playerHand = [
@@ -359,17 +359,18 @@ describe('calculating non-busting hand values', () => {
       twentyone.createCard('3', twentyone.SUITS[0]),
       twentyone.createCard('jack', twentyone.SUITS[0]),
     ];
-    expect(twentyone.getNonBustedHandTotals(player.playerHand).at(-1))
+    expect(twentyone.getMaxNonBustedHandTotal(player.playerHand))
       .toBeLessThanOrEqual(twentyone.GAME_OBJECT_VALUE);
   });
 
-  it('busted hand has zero possible total hand values', () => {
+  it('busted hand total === GAME_RESULT_PLAYER_BUST', () => {
     player.playerHand = [
       twentyone.createCard('jack', twentyone.SUITS[0]),
       twentyone.createCard('queen', twentyone.SUITS[0]),
       twentyone.createCard('2', twentyone.SUITS[0]),
     ];
-    expect(twentyone.getNonBustedHandTotals(player.playerHand)).toHaveLength(0);
+    expect(twentyone.getMaxNonBustedHandTotal(player.playerHand))
+      .toBe(twentyone.GAME_RESULT_PLAYER_BUST);
   });
 });
 
