@@ -166,7 +166,9 @@ function getHandMaxTotal(playerHand) {
 }
 
 function getMaxNonBustedHandTotal(playerHand) {
-  return getNonBustedHandTotals(playerHand).at(-1);
+  let totals = getNonBustedHandTotals(playerHand);
+  if (totals.length > 0) return totals.at(-1);
+  return GAME_RESULT_PLAYER_BUST;
 }
 
 function getHandCardValues(playerHand) {
