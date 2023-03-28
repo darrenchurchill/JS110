@@ -385,7 +385,7 @@ describe('doing the dealer turn', () => {
         twentyone.createCard('10', twentyone.SUITS[0]),
         twentyone.createCard('2', twentyone.SUITS[0]),
       ];
-      expect(twentyone.doDealerTurn(deck, dealer))
+      expect(twentyone.doDealerTurn(deck, player, dealer))
         .toBe(twentyone.DEALER_STAY_VALUE);
 
       dealer.playerHand = [
@@ -396,7 +396,7 @@ describe('doing the dealer turn', () => {
         twentyone.createCard('2', twentyone.SUITS[0]),
         twentyone.createCard('10', twentyone.SUITS[0]),
       ];
-      expect(twentyone.doDealerTurn(deck, dealer))
+      expect(twentyone.doDealerTurn(deck, player, dealer))
         .toBe(twentyone.DEALER_STAY_VALUE);
 
     });
@@ -410,7 +410,7 @@ describe('doing the dealer turn', () => {
         twentyone.createCard('2', twentyone.SUITS[0]),
         twentyone.createCard('10', twentyone.SUITS[0]),
       ];
-      expect(twentyone.doDealerTurn(deck, dealer))
+      expect(twentyone.doDealerTurn(deck, player, dealer))
         .toBeGreaterThan(twentyone.DEALER_STAY_VALUE);
 
       dealer.playerHand = [
@@ -421,7 +421,7 @@ describe('doing the dealer turn', () => {
         twentyone.createCard('6', twentyone.SUITS[0]),
         twentyone.createCard('2', twentyone.SUITS[0]),
       ];
-      expect(twentyone.doDealerTurn(deck, dealer))
+      expect(twentyone.doDealerTurn(deck, player, dealer))
         .toBeGreaterThan(twentyone.DEALER_STAY_VALUE);
     });
 
@@ -433,7 +433,7 @@ describe('doing the dealer turn', () => {
       deck = [
         twentyone.createCard('10', twentyone.SUITS[0]),
       ];
-      expect(twentyone.doDealerTurn(deck, dealer))
+      expect(twentyone.doDealerTurn(deck, player, dealer))
         .toBeGreaterThan(twentyone.DEALER_STAY_VALUE);
     });
   });
@@ -447,7 +447,7 @@ describe('doing the dealer turn', () => {
       twentyone.createCard('6', twentyone.SUITS[0]),
       twentyone.createCard('6', twentyone.SUITS[0]),
     ];
-    expect(twentyone.doDealerTurn(deck, dealer))
+    expect(twentyone.doDealerTurn(deck, player, dealer))
       .toBe(twentyone.GAME_RESULT_PLAYER_BUST);
   });
 });
