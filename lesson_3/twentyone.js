@@ -243,6 +243,12 @@ function getHandTotals(playerHand) {
   );
 }
 
+function getHandTotal(playerHand) {
+  let totals = getHandTotals(playerHand);
+  if (totals.length === 1 || totals[0] >= GAME_OBJECT_VALUE) return totals[0];
+  return totals[1];
+}
+
 function getNonBustedHandTotals(playerHand) {
   return getHandTotals(playerHand).filter(
     (total) => total <= GAME_OBJECT_VALUE
@@ -318,6 +324,7 @@ module.exports = {
   getMaxNonBustedHandTotal,
   getHandCardValues,
   getHandTotals,
+  getHandTotal,
   getNonBustedHandTotals,
   isBusted,
 };

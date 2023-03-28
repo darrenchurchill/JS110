@@ -269,6 +269,10 @@ describe('calculating player hands', () => {
       it('there is only one possible total hand value', () => {
         expect(twentyone.getHandTotals(player.playerHand)).toHaveLength(1);
       });
+
+      it('should have the correct card total', () => {
+        expect(twentyone.getHandTotal(player.playerHand)).toBe(5);
+      });
     });
 
     describe('when there are one or more aces', () => {
