@@ -110,22 +110,71 @@ function shuffle(deck) {
   return deck;
 }
 
-function doPlayerTurn(playerInfo) {
+function displayPlayerHands(playerInfo, dealerInfo, dealerFaceDown = true) {
+  console.clear();
+  displayOutput(getPlayerHandString(dealerInfo, dealerFaceDown));
+  displayOutput(getPlayerHandString(playerInfo));
+}
 
+function getPlayerHandString(playerInfo, secondFaceDown = false) {
+  let total = isBusted(playerInfo.playerHand)
+    ? getHandMinTotal(playerInfo.playerHand)
+    : getMaxNonBustedHandTotal(playerInfo.playerHand);
+
+  let cards = playerInfo.playerHand.map((card) => card.name);
+
+  secondFaceDown = cards.length === 2 && secondFaceDown;
+  if (secondFaceDown) cards[1] = 'unknown card';
+
+  return (
+    `${playerInfo.name} has: ${cards} ` +
+    `${secondFaceDown ? '' : `(total: ${total})`}`
+  );
+}
+
+function doPlayerTurn(deck, playerInfo, dealerInfo) {
+  let dealerFaceDown = true;
+
+  while (!isBusted(playerInfo.playerHand)) {
+    displayPlayerHands(playerInfo, dealerInfo, dealerFaceDown);
+    let choice = promptWithChoices('Your choice?', ['hit', 'stay']);
+
+    if (choice === 'stay') {
+      return getMaxNonBustedHandTotal(playerInfo.playerHand);
+    }
+    dealCard(deck, playerInfo);
+  }
+
+  displayPlayerHands(playerInfo, dealerInfo, dealerFaceDown);
+  return GAME_RESULT_PLAYER_BUST;
 }
 
 function shouldDealerHit(dealerInfo) {
   return getMaxNonBustedHandTotal(dealerInfo.playerHand) < DEALER_STAY_VALUE;
 }
 
-function doDealerTurn(deck, dealerInfo) {
+function sleep(ms) {
+  const date = Date.now();
+  while (true) {
+    let currentDate = Date.now();
+    if (currentDate - date > ms) return;
+  }
+}
+
+function doDealerTurn(deck, playerInfo, dealerInfo) {
+  let dealerFaceDown = false;
+
   while (!isBusted(dealerInfo.playerHand)) {
+    displayPlayerHands(playerInfo, dealerInfo, dealerFaceDown);
+
     if (!shouldDealerHit(dealerInfo)) {
       return getMaxNonBustedHandTotal(dealerInfo.playerHand);
     }
+    sleep(1000);
     dealCard(deck, dealerInfo);
   }
 
+  displayPlayerHands(playerInfo, dealerInfo, dealerFaceDown);
   return GAME_RESULT_PLAYER_BUST;
 }
 
@@ -157,10 +206,12 @@ function createPlayer(name, playerType) {
   };
 }
 
+// TODO: remove?
 function getHandMinTotal(playerHand) {
   return getHandTotals(playerHand).at(0);
 }
 
+// TODO: remove?
 function getHandMaxTotal(playerHand) {
   return getHandTotals(playerHand).at(-1);
 }
@@ -202,8 +253,36 @@ function isBusted(playerHand) {
   return getNonBustedHandTotals(playerHand).length === 0;
 }
 
+// eslint-disable-next-line max-lines-per-function
+function playTwentyOne(playerInfo, dealerInfo) {
+  let deck = createDeck();
+  shuffle(deck);
+
+  dealInitialHands(deck, playerInfo, dealerInfo);
+  let players = [playerInfo, dealerInfo];
+
+  for (let curPlayer of players) {
+    curPlayer.handTotal = curPlayer.doTurnCallback(deck, ...players);
+    if (curPlayer.handTotal === GAME_RESULT_PLAYER_BUST) {
+      displayOutput(`${curPlayer.name} busts.`);
+      return;
+    }
+  }
+
+  if (playerInfo.handTotal > dealerInfo.handTotal) {
+    displayOutput(`${playerInfo.name} wins!`);
+  } else if (dealerInfo.handTotal > playerInfo.handTotal) {
+    displayOutput(`${dealerInfo.name} wins.`);
+  } else {
+    displayOutput("It's a tie.");
+  }
+}
+
 if (require.main === module) {
-  console.log(shuffle(createDeck()));
+  let player = createPlayer('player', PLAYER_TYPE_PLAYER);
+  let dealer = createPlayer('dealer', PLAYER_TYPE_DEALER);
+
+  playTwentyOne(player, dealer);
 }
 
 module.exports = {
