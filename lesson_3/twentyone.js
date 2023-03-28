@@ -239,7 +239,7 @@ function getHandCardValues(playerHand) {
 
 function getHandTotals(playerHand) {
   return getHandCardValues(playerHand).map((cardValues) =>
-    cardValues.reduce((accum, cardValue) => accum + cardValue)
+    cardValues.reduce((accum, cardValue) => accum + cardValue, 0)
   );
 }
 
