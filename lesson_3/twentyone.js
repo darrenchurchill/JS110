@@ -158,11 +158,11 @@ function createPlayer(name, playerType) {
 }
 
 function getHandMinTotal(playerHand) {
-  return playerHand.reduce((accum, card) => accum + card.minValue, 0);
+  return getHandTotals(playerHand).at(0);
 }
 
 function getHandMaxTotal(playerHand) {
-  return playerHand.reduce((accum, card) => accum + card.maxValue, 0);
+  return getHandTotals(playerHand).at(-1);
 }
 
 function getMaxNonBustedHandTotal(playerHand) {
@@ -185,23 +185,9 @@ function getHandCardValues(playerHand) {
 }
 
 function getHandTotals(playerHand) {
-  let normalCards = playerHand.filter((card) =>
-    NUMBER_CARDS.includes(card.name) || FACE_CARDS_REGULAR.includes(card.name)
+  return getHandCardValues(playerHand).map((cardValues) =>
+    cardValues.reduce((accum, cardValue) => accum + cardValue)
   );
-  let specialCards = playerHand.filter((card) =>
-    FACE_CARDS_SPECIAL.includes(card.name)
-  );
-  let totalValues = [
-    normalCards.reduce((accum, card) => accum + card.minValue, 0),
-  ];
-
-  for (let card of specialCards) {
-    let lastVal = totalValues.at(-1);
-    totalValues = totalValues.map((val) => val + card.minValue);
-    totalValues.push(lastVal + card.maxValue);
-  }
-
-  return totalValues;
 }
 
 function getNonBustedHandTotals(playerHand) {

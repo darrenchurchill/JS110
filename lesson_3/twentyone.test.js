@@ -272,34 +272,14 @@ describe('calculating player hands', () => {
     });
 
     describe('when there are one or more aces', () => {
-      it('there are (numAces + 1) possible total hand values', () => {
-        let count = 0;
+      it('there are two possible total hand values', () => {
         for (let suit of twentyone.SUITS) {
           player.playerHand.push(
             twentyone.createCard(twentyone.FACE_CARDS_SPECIAL[0], suit)
           );
-          count += 1;
-          expect(twentyone.getHandTotals(player.playerHand))
-            .toHaveLength(count + 1);
+          expect(twentyone.getHandTotals(player.playerHand)).toHaveLength(2);
         }
       });
-    });
-
-    it('max hand value is larger than min hand value by multiple of # aces', () => {
-      let numAces = 0;
-
-      for (let suit of twentyone.SUITS) {
-        let ace = twentyone.createCard(twentyone.FACE_CARDS_SPECIAL[0], suit);
-        player.playerHand.push(ace);
-
-        numAces += 1;
-        let aceDiff = ace.maxValue - ace.minValue;
-
-        expect(
-          twentyone.getHandMaxTotal(player.playerHand) -
-            twentyone.getHandMinTotal(player.playerHand)
-        ).toBe(aceDiff * numAces);
-      }
     });
 
     it('max hand value === final value in hand total values', () => {
