@@ -169,6 +169,21 @@ function getMaxNonBustedHandTotal(playerHand) {
   return getNonBustedHandTotals(playerHand).at(-1);
 }
 
+function getHandCardValues(playerHand) {
+  let minValues = playerHand.map((card) => card.minValue);
+  let result = [minValues];
+
+  let idxOfSpecial = playerHand.findIndex((card) =>
+    FACE_CARDS_SPECIAL.includes(card.name)
+  );
+  if (idxOfSpecial > 0) {
+    result.push([...result[0]]);
+    result[1][idxOfSpecial] = playerHand[idxOfSpecial].maxValue;
+  }
+
+  return result;
+}
+
 function getHandTotals(playerHand) {
   let normalCards = playerHand.filter((card) =>
     NUMBER_CARDS.includes(card.name) || FACE_CARDS_REGULAR.includes(card.name)
@@ -234,6 +249,7 @@ module.exports = {
   getHandMinTotal,
   getHandMaxTotal,
   getMaxNonBustedHandTotal,
+  getHandCardValues,
   getHandTotals,
   getNonBustedHandTotals,
   isBusted,

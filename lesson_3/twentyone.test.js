@@ -195,7 +195,7 @@ describe('dealing cards', () => {
   });
 });
 
-describe('calculating player hand total values', () => {
+describe('calculating player hands', () => {
   beforeEach(() => {
     player.playerHand = [
       twentyone.createCard(twentyone.NUMBER_CARDS[0], twentyone.SUITS[0]),
@@ -203,56 +203,114 @@ describe('calculating player hand total values', () => {
     ];
   });
 
-  describe('when there are no aces', () => {
-    it('min hand value === max hand value', () => {
-      expect(twentyone.getHandMinTotal(player.playerHand))
-        .toBe(twentyone.getHandMaxTotal(player.playerHand));
+  describe('player hand card values', () => {
+    describe('when there are no aces', () => {
+      it('there is only one possible set of card values', () => {
+        expect(twentyone.getHandCardValues(player.playerHand)).toHaveLength(1);
+      });
+
+      it('should have the correct card values, in the same order as cards of hand', () => {
+        expect(twentyone.getHandCardValues(player.playerHand))
+          .toEqual([[2, 3]]);
+      });
     });
 
-    it('there is only one possible total hand value', () => {
-      expect(twentyone.getHandTotals(player.playerHand)).toHaveLength(1);
+    describe('when there is one ace', () => {
+      beforeEach(() => {
+        player.playerHand = [
+          twentyone.createCard('7', twentyone.SUITS[0]),
+          twentyone.createCard('ace', twentyone.SUITS[0]),
+        ];
+      });
+
+      it('there are two possible sets of card values', () => {
+        expect(twentyone.getHandCardValues(player.playerHand)).toHaveLength(2);
+      });
+
+      it('should have the correct card values, in the same order as cards of hand', () => {
+        expect(twentyone.getHandCardValues(player.playerHand))
+          .toEqual([[7, 1], [7, 11]]);
+      });
+    });
+
+    describe('when there are two or more aces', () => {
+      beforeEach(() => {
+        player.playerHand = [
+          twentyone.createCard('10', twentyone.SUITS[0]),
+          twentyone.createCard('ace', twentyone.SUITS[0]),
+          twentyone.createCard('ace', twentyone.SUITS[1]),
+        ];
+      });
+
+      it('there are two possible sets of card values', () => {
+        expect(twentyone.getHandCardValues(player.playerHand)).toHaveLength(2);
+      });
+
+      it('should have the correct card values, in the same order as cards of hand', () => {
+        expect(twentyone.getHandCardValues(player.playerHand))
+          .toEqual([[10, 1, 1], [10, 11, 1]]);
+
+        player.playerHand.push(
+          twentyone.createCard('ace', twentyone.SUITS[2]),
+        );
+        expect(twentyone.getHandCardValues(player.playerHand))
+          .toEqual([[10, 1, 1, 1], [10, 11, 1, 1]]);
+      });
     });
   });
 
-  describe('when there are one or more aces', () => {
-    it('there are (numAces + 1) possible total hand values', () => {
-      let count = 0;
+  describe('player hand total values', () => {
+    describe('when there are no aces', () => {
+      it('min hand value === max hand value', () => {
+        expect(twentyone.getHandMinTotal(player.playerHand))
+          .toBe(twentyone.getHandMaxTotal(player.playerHand));
+      });
+
+      it('there is only one possible total hand value', () => {
+        expect(twentyone.getHandTotals(player.playerHand)).toHaveLength(1);
+      });
+    });
+
+    describe('when there are one or more aces', () => {
+      it('there are (numAces + 1) possible total hand values', () => {
+        let count = 0;
+        for (let suit of twentyone.SUITS) {
+          player.playerHand.push(
+            twentyone.createCard(twentyone.FACE_CARDS_SPECIAL[0], suit)
+          );
+          count += 1;
+          expect(twentyone.getHandTotals(player.playerHand))
+            .toHaveLength(count + 1);
+        }
+      });
+    });
+
+    it('max hand value is larger than min hand value by multiple of # aces', () => {
+      let numAces = 0;
+
+      for (let suit of twentyone.SUITS) {
+        let ace = twentyone.createCard(twentyone.FACE_CARDS_SPECIAL[0], suit);
+        player.playerHand.push(ace);
+
+        numAces += 1;
+        let aceDiff = ace.maxValue - ace.minValue;
+
+        expect(
+          twentyone.getHandMaxTotal(player.playerHand) -
+            twentyone.getHandMinTotal(player.playerHand)
+        ).toBe(aceDiff * numAces);
+      }
+    });
+
+    it('max hand value === final value in hand total values', () => {
       for (let suit of twentyone.SUITS) {
         player.playerHand.push(
           twentyone.createCard(twentyone.FACE_CARDS_SPECIAL[0], suit)
         );
-        count += 1;
-        expect(twentyone.getHandTotals(player.playerHand))
-          .toHaveLength(count + 1);
       }
+      expect(twentyone.getHandMaxTotal(player.playerHand))
+        .toBe(twentyone.getHandTotals(player.playerHand).at(-1));
     });
-  });
-
-  it('max hand value is larger than min hand value by multiple of # aces', () => {
-    let numAces = 0;
-
-    for (let suit of twentyone.SUITS) {
-      let ace = twentyone.createCard(twentyone.FACE_CARDS_SPECIAL[0], suit);
-      player.playerHand.push(ace);
-
-      numAces += 1;
-      let aceDiff = ace.maxValue - ace.minValue;
-
-      expect(
-        twentyone.getHandMaxTotal(player.playerHand) -
-          twentyone.getHandMinTotal(player.playerHand)
-      ).toBe(aceDiff * numAces);
-    }
-  });
-
-  it('max hand value === final value in hand total values', () => {
-    for (let suit of twentyone.SUITS) {
-      player.playerHand.push(
-        twentyone.createCard(twentyone.FACE_CARDS_SPECIAL[0], suit)
-      );
-    }
-    expect(twentyone.getHandMaxTotal(player.playerHand))
-      .toBe(twentyone.getHandTotals(player.playerHand).at(-1));
   });
 });
 
