@@ -235,7 +235,7 @@ function getHandCardValues(playerHand) {
   let idxOfSpecial = playerHand.findIndex((card) =>
     FACE_CARDS_SPECIAL.includes(card.name)
   );
-  if (idxOfSpecial > 0) {
+  if (idxOfSpecial >= 0) {
     result.push([...result[0]]);
     result[1][idxOfSpecial] = playerHand[idxOfSpecial].maxValue;
   }
