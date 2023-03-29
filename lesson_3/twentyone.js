@@ -260,8 +260,9 @@ function getHandTotals(playerHand) {
 
 function getHandTotal(playerHand) {
   let totals = getHandTotals(playerHand);
-  if (totals.length === 1 || totals[0] >= GAME_OBJECT_VALUE) return totals[0];
-  return totals[1];
+  if (totals.length === 1) return totals[0];
+  if (totals[1] <= GAME_OBJECT_VALUE) return totals[1];
+  return totals[0];
 }
 
 function getNonBustedHandTotals(playerHand) {
