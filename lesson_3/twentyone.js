@@ -128,10 +128,7 @@ function displayPlayerHands(playerInfo, dealerInfo, dealerFaceDown = true) {
 }
 
 function getPlayerHandString(playerInfo, secondFaceDown = false) {
-  let total = isBusted(playerInfo.playerHand)
-    ? getHandMinTotal(playerInfo.playerHand)
-    : getMaxNonBustedHandTotal(playerInfo.playerHand);
-
+  let total = getHandTotal(playerInfo.playerHand);
   let cards = playerInfo.playerHand.map((card) => card.name);
 
   secondFaceDown = cards.length === 2 && secondFaceDown;
