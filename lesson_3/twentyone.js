@@ -81,6 +81,22 @@ function joinOr(array, delimiter = ', ', lastWord = 'or') {
   return `${firstSlice}${delimiter}${lastWord ? `${lastWord} ` : ''}${lastElem}`;
 }
 
+/**
+ * Definition of a Card object's properties
+ * @typedef {object} Card
+ * @property {string} name - the card name (i.e. `'7'` or `'jack'`)
+ * @property {number} maxValue - the card's maximum possible value. `maxValue`
+ * === `minValue` for all cards except Ace's.
+ * @property {number} minValue - the card's minimum possible value.
+ * @property {string} suit - the card suit (i.e. `'hearts'` or `'clubs'`)
+ */
+
+/**
+ * Create an individual Card with the name and suit
+ * @param {string} name - the card name
+ * @param {string} suit - the card suit
+ * @returns {Card}
+ */
 function createCard(name, suit) {
   let value = Number(name);
   if (FACE_CARDS_REGULAR.includes(name)) value = FACE_CARDS_REGULAR_VALUE;
@@ -98,11 +114,20 @@ function createCard(name, suit) {
   });
 }
 
+/**
+ * Create a set of Cards all of one suit
+ * @param {string} suit - the suit to create
+ * @returns {Card[]} the Cards of this suit
+ */
 function createSuit(suit) {
   let cards = NUMBER_CARDS.concat(FACE_CARDS_REGULAR, FACE_CARDS_SPECIAL);
   return cards.map((card) => createCard(card, suit));
 }
 
+/**
+ * Create an entire deck of Cards
+ * @returns {Card[]} the deck of Cards
+ */
 function createDeck() {
   return SUITS.flatMap((suit) => createSuit(suit));
 }
@@ -120,12 +145,26 @@ function shuffle(deck) {
   return deck;
 }
 
+/**
+ * Display each player's hand contents and total value
+ * @param {PlayerInfo} playerInfo - the user player
+ * @param {PlayerInfo} dealerInfo - the computer dealer
+ * @param {boolean} dealerFaceDown - whether to obscure the dealer's second Card
+ * and total hand value.
+ */
 function displayPlayerHands(playerInfo, dealerInfo, dealerFaceDown = true) {
   console.clear();
   displayOutput(getPlayerHandString(dealerInfo, dealerFaceDown));
   displayOutput(getPlayerHandString(playerInfo));
 }
 
+/**
+ * Return the string representation of a Player's hand
+ * @param {PlayerInfo} playerInfo - the Player
+ * @param {boolean} secondFaceDown - whether to obscure the Player's second Card
+ * and total value. (used to hide the Dealer's second card and total)
+ * @returns {string}
+ */
 function getPlayerHandString(playerInfo, secondFaceDown = false) {
   let cards = playerInfo.playerHand.map(
     (card) => card.name[0].toUpperCase() + card.name.slice(1)
@@ -141,6 +180,22 @@ function getPlayerHandString(playerInfo, secondFaceDown = false) {
   );
 }
 
+/**
+ * Definition of a player turn callback function's parameters and return value
+ * @callback playerTurnCallback
+ * @param {Card[]} deck
+ * @param {PlayerInfo} playerInfo
+ * @param {PlayerInfo} dealerInfo
+ * @returns {undefined}
+ */
+
+/**
+ * Complete a user (Player) turn, prompting the user to hit or stay, and dealing
+ * them card(s) accordingly.
+ * @param {Card[]} deck - the current deck of Cards
+ * @param {PlayerInfo} playerInfo - the Player
+ * @param {PlayerInfo} dealerInfo - the Dealer
+ */
 function doPlayerTurn(deck, playerInfo, dealerInfo) {
   let dealerFaceDown = true;
 
@@ -157,6 +212,11 @@ function doPlayerTurn(deck, playerInfo, dealerInfo) {
   displayPlayerHands(playerInfo, dealerInfo, dealerFaceDown);
 }
 
+/**
+ * Returns true if the Dealer should hit according to the rules
+ * @param {PlayerInfo} dealerInfo - the Dealer
+ * @returns {boolean}
+ */
 function shouldDealerHit(dealerInfo) {
   return dealerInfo.handTotal < DEALER_STAY_VALUE;
 }
@@ -173,6 +233,13 @@ function sleep(ms) {
   }
 }
 
+/**
+ * Complete a dealer turn, automatically hitting and staying according to the
+ * dealer's rules.
+ * @param {Card[]} deck - the current deck of Cards
+ * @param {PlayerInfo} playerInfo - the Player
+ * @param {PlayerInfo} dealerInfo - the Dealer
+ */
 function doDealerTurn(deck, playerInfo, dealerInfo) {
   let dealerFaceDown = false;
 
@@ -189,11 +256,23 @@ function doDealerTurn(deck, playerInfo, dealerInfo) {
   displayPlayerHands(playerInfo, dealerInfo, dealerFaceDown);
 }
 
+/**
+ * Deal a card to a player, updating the `player.playerHand` and
+ * `player.handTotal` properties accordingly
+ * @param {Card[]} deck - the current deck of Cards
+ * @param {PlayerInfo} player - the Player
+ */
 function dealCard(deck, player) {
   player.playerHand.push(deck.shift());
   player.handTotal = getHandTotal(player.playerHand);
 }
 
+/**
+ * Deal the initial hand of 2 cards to the player and dealer
+ * @param {Card[]} deck - the current deck of Cards
+ * @param {PlayerInfo} player - the Player
+ * @param {PlayerInfo} dealer - the Dealer
+ */
 function dealInitialHands(deck, player, dealer) {
   for (let _ = 0; _ < INITIAL_HAND_SIZE; _++) {
     dealCard(deck, player);
@@ -201,6 +280,25 @@ function dealInitialHands(deck, player, dealer) {
   }
 }
 
+/**
+ * Definition of a Player object's properties
+ * @typedef {object} PlayerInfo
+ * @property {string} name - the player's name
+ * @property {number} playerType - the player type, representing either a user
+ * player or a computer dealer
+ * @property {Card[]} playerHand - the player's current hand of Cards
+ * @property {number} handTotal - the player's current calculated hand total
+ * @property {playerTurnCallback} doTurnCallback - the callback function to
+ * execute this user type's turn
+ */
+
+/**
+ * Create a player given a `name` and `playerType`
+ * @param {string} name - the player's name
+ * @param {number} playerType - the player type, representing either a user
+ * player or a computer dealer
+ * @returns {PlayerInfo} the Player
+ */
 function createPlayer(name, playerType) {
   if (playerType !== PLAYER_TYPE_PLAYER && playerType !== PLAYER_TYPE_DEALER) {
     throw new RangeError(
@@ -219,6 +317,12 @@ function createPlayer(name, playerType) {
   };
 }
 
+/**
+ * Returns an array of 1 or 2 arrays; each sub-array representing a list of
+ * each card's value in the player's hand.
+ * @param {Card[]} playerHand - the player hand as an array of Cards
+ * @returns {Array.<number[]>}
+ */
 function getHandCardValues(playerHand) {
   let minValues = playerHand.map((card) => card.minValue);
   let result = [minValues];
@@ -234,12 +338,25 @@ function getHandCardValues(playerHand) {
   return result;
 }
 
+/**
+ * Returns an array of 1 or 2 hand total values; each representing a possible
+ * total hand value, depending on how ace's (if any) are valued.
+ * @param {Card[]} playerHand - the player hand as an array of Cards
+ * @returns {number[]} the hand total values
+ */
 function getHandTotals(playerHand) {
   return getHandCardValues(playerHand).map((cardValues) =>
     cardValues.reduce((accum, cardValue) => accum + cardValue, 0)
   );
 }
 
+/**
+ * Calculate the definitive total value of a player's hand. This is the highest
+ * possible non-busting total value, if there is one; or, the lowest busting
+ * value if all the values are busted.
+ * @param {Card[]} playerHand - the player hand as an array of Cards
+ * @returns {number} the hand total value
+ */
 function getHandTotal(playerHand) {
   let totals = getHandTotals(playerHand);
   if (totals.length === 1) return totals[0];
@@ -247,6 +364,13 @@ function getHandTotal(playerHand) {
   return totals[0];
 }
 
+/**
+ * Return true if the player hand (array of `Cards`) of player hand total
+ * `number` is busted.
+ * @param {Card[] | number} player - the player hand as an array of `Cards`, or
+ * the player hand total (`number`)
+ * @returns {boolean}
+ */
 function isBusted(playerHandOrHandTotal) {
   if (Array.isArray(playerHandOrHandTotal)) {
     return getHandTotal(playerHandOrHandTotal) > GAME_OBJECT_VALUE;
@@ -256,6 +380,13 @@ function isBusted(playerHandOrHandTotal) {
   return playerHandOrHandTotal > GAME_OBJECT_VALUE;
 }
 
+/**
+ * Play a single game of Twenty-One. Prompts user for their choice to hit or
+ * stay, outputs the hand values at each step, and displays the dealers's turn.
+ * @param {PlayerInfo} playerInfo - the user player
+ * @param {PlayerInfo} dealerInfo - the computer dealer
+ * @returns {undefined}
+ */
 // eslint-disable-next-line max-lines-per-function
 function playTwentyOne(playerInfo, dealerInfo) {
   let deck = createDeck();
