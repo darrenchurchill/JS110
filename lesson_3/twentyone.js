@@ -25,6 +25,8 @@ const DEALER_STAY_VALUE = 17;
 const GAME_OBJECT_VALUE = 21;
 const GAME_RESULT_PLAYER_BUST = -1;
 
+let dealerTurnSleepDuration = 1000;  // milliseconds
+
 function prompt(promptText) {
   return readline.questionInt(promptText);
 }
@@ -153,6 +155,10 @@ function shouldDealerHit(dealerInfo) {
   return getMaxNonBustedHandTotal(dealerInfo.playerHand) < DEALER_STAY_VALUE;
 }
 
+function setDealerTurnSleepDuration(ms) {
+  dealerTurnSleepDuration = ms;
+}
+
 function sleep(ms) {
   const date = Date.now();
   while (true) {
@@ -170,7 +176,7 @@ function doDealerTurn(deck, playerInfo, dealerInfo) {
     if (!shouldDealerHit(dealerInfo)) {
       return getMaxNonBustedHandTotal(dealerInfo.playerHand);
     }
-    sleep(1000);
+    sleep(dealerTurnSleepDuration);
     dealCard(deck, dealerInfo);
   }
 
@@ -315,6 +321,7 @@ module.exports = {
   shuffle,
   doPlayerTurn,
   shouldDealerHit,
+  setDealerTurnSleepDuration,
   doDealerTurn,
   dealCard,
   dealInitialHands,

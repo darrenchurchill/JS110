@@ -8,6 +8,7 @@
  */
 
 const twentyone = require('./twentyone');
+twentyone.setDealerTurnSleepDuration(0);  // So running tests is fast.
 
 let deck;
 let player;
