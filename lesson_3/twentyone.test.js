@@ -1,3 +1,4 @@
+/* eslint-disable max-statements */
 /* eslint-disable max-nested-callbacks */
 /* eslint-disable max-lines-per-function */
 /**
@@ -380,17 +381,32 @@ describe('calculating player hands', () => {
           twentyone.createCard('ace', twentyone.SUITS[0]),
           twentyone.createCard('2', twentyone.SUITS[0]),
         ];
+        expect(twentyone.getHandTotals(player.playerHand)).toHaveLength(2);
+        expect(twentyone.getHandTotals(player.playerHand)).toEqual([3, 13]);
         expect(twentyone.getHandTotal(player.playerHand)).toBe(13);
 
         player.playerHand.push(
           twentyone.createCard('ace', twentyone.SUITS[1]),
         );
+        expect(twentyone.getHandTotals(player.playerHand)).toHaveLength(2);
+        expect(twentyone.getHandTotals(player.playerHand)).toEqual([4, 14]);
         expect(twentyone.getHandTotal(player.playerHand)).toBe(14);
 
         player.playerHand.push(
           twentyone.createCard('queen', twentyone.SUITS[1]),
         );
-        expect(twentyone.getHandTotal(player.playerHand)).toBe(24);
+        expect(twentyone.getHandTotals(player.playerHand)).toHaveLength(2);
+        expect(twentyone.getHandTotals(player.playerHand)).toEqual([14, 24]);
+        expect(twentyone.getHandTotal(player.playerHand)).toBe(14);
+
+        player.playerHand = [
+          twentyone.createCard('7', twentyone.SUITS[0]),
+          twentyone.createCard('7', twentyone.SUITS[1]),
+          twentyone.createCard('ace', twentyone.SUITS[0]),
+        ];
+        expect(twentyone.getHandTotals(player.playerHand)).toHaveLength(2);
+        expect(twentyone.getHandTotals(player.playerHand)).toEqual([15, 25]);
+        expect(twentyone.getHandTotal(player.playerHand)).toBe(15);
       });
     });
 
