@@ -146,6 +146,19 @@ function shuffle(deck) {
 }
 
 /**
+ * Display the current round score: each player's number of wins
+ * @param {PlayerInfo} playerInfo - the user player
+ * @param {PlayerInfo} dealerInfo - the computer dealer
+ */
+function displayRoundScore(playerInfo, dealerInfo) {
+  displayOutput(
+    `Round score: ` +
+      `${playerInfo.name}: ${playerInfo.numWins} ` +
+      `${dealerInfo.name}: ${dealerInfo.numWins}`
+  );
+}
+
+/**
  * Display each player's hand contents and total value
  * @param {PlayerInfo} playerInfo - the user player
  * @param {PlayerInfo} dealerInfo - the computer dealer
@@ -154,6 +167,7 @@ function shuffle(deck) {
  */
 function displayPlayerHands(playerInfo, dealerInfo, dealerFaceDown = true) {
   console.clear();
+  displayRoundScore(playerInfo, dealerInfo);
   displayOutput(getPlayerHandString(dealerInfo, dealerFaceDown));
   displayOutput(getPlayerHandString(playerInfo));
 }
@@ -288,6 +302,8 @@ function dealInitialHands(deck, player, dealer) {
  * player or a computer dealer
  * @property {Card[]} playerHand - the player's current hand of Cards
  * @property {number} handTotal - the player's current calculated hand total
+ * @property {number} numWins - the player's total number of wins in a best-of
+ * round.
  * @property {playerTurnCallback} doTurnCallback - the callback function to
  * execute this user type's turn
  */
@@ -312,6 +328,7 @@ function createPlayer(name, playerType) {
     playerType: playerType,
     playerHand: [],
     handTotal: 0,
+    numWins: 0,
     doTurnCallback:
       playerType === PLAYER_TYPE_PLAYER ? doPlayerTurn : doDealerTurn,
   };
@@ -385,9 +402,9 @@ function isBusted(playerHandOrHandTotal) {
  * stay, outputs the hand values at each step, and displays the dealers's turn.
  * @param {PlayerInfo} playerInfo - the user player
  * @param {PlayerInfo} dealerInfo - the computer dealer
- * @returns {undefined}
+ * @returns {PlayerInfo | null} - the winner, or `null` if it's a tie
  */
-// eslint-disable-next-line max-lines-per-function
+// eslint-disable-next-line max-lines-per-function, max-statements
 function playTwentyOne(playerInfo, dealerInfo) {
   let deck = createDeck();
   shuffle(deck);
@@ -402,16 +419,44 @@ function playTwentyOne(playerInfo, dealerInfo) {
     curPlayer.doTurnCallback(deck, ...players);
     if (isBusted(curPlayer.handTotal)) {
       displayOutput(`${curPlayer.name} busts.`);
-      return;
+      return curPlayer === playerInfo ? dealerInfo : playerInfo;
     }
   }
 
   if (playerInfo.handTotal > dealerInfo.handTotal) {
     displayOutput(`${playerInfo.name} wins!`);
+    return playerInfo;
   } else if (dealerInfo.handTotal > playerInfo.handTotal) {
     displayOutput(`${dealerInfo.name} wins.`);
+    return dealerInfo;
   } else {
     displayOutput("It's a tie.");
+    return null;
+  }
+}
+
+/**
+ * Play a round of multiple games of Twenty-One, best of: `bestOf`
+ * @param {PlayerInfo} player - the user player
+ * @param {PlayerInfo} dealer - the computer dealer
+ * @returns {PlayerInfo} the round winner
+ */
+function playRound(player, dealer, bestOf = 5) {
+  player.numWins = 0;
+  dealer.numWins = 0;
+
+  while (true) {
+    let winner = playTwentyOne(player, dealer);
+
+    if (winner === player) {
+      player.numWins += 1;
+      if (player.numWins > Math.floor(bestOf / 2)) return player;
+    } else if (winner === dealer) {
+      dealer.numWins += 1;
+      if (dealer.numWins > Math.floor(bestOf / 2)) return dealer;
+    }
+
+    readline.question('Press enter to continue.');
   }
 }
 
@@ -426,7 +471,10 @@ function playUntilDone() {
   let dealer = createPlayer('Dealer', PLAYER_TYPE_DEALER);
 
   while (true) {
-    playTwentyOne(player, dealer);
+    let winner = playRound(player, dealer);
+    displayRoundScore(player, dealer);
+    displayOutput(`${winner.name} wins the round!!!`);
+
 
     if (!shouldPlayAgain()) return;
   }
