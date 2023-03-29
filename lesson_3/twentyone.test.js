@@ -415,44 +415,6 @@ describe('calculating non-busting hand values', () => {
     ];
   });
 
-  describe('when there are no aces', () => {
-    it('there is only one possible total hand value', () => {
-      expect(twentyone.getNonBustedHandTotals(player.playerHand))
-        .toHaveLength(1);
-    });
-  });
-
-  describe('when there are one or more aces', () => {
-    it('there are two possible total hand values', () => {
-      for (let suit of twentyone.SUITS) {
-        player.playerHand.push(
-          twentyone.createCard(twentyone.FACE_CARDS_SPECIAL[0], suit)
-        );
-        expect(twentyone.getNonBustedHandTotals(player.playerHand))
-          .toHaveLength(2);
-      }
-    });
-  });
-
-  it('should calculate the correct hand values', () => {
-    player.playerHand = [
-      twentyone.createCard('jack', twentyone.SUITS[0]),
-      twentyone.createCard('ace', twentyone.SUITS[0]),
-    ];
-    expect(twentyone.getNonBustedHandTotals(player.playerHand).at(0))
-      .toBe(11);
-    expect(twentyone.getNonBustedHandTotals(player.playerHand).at(-1))
-      .toBe(twentyone.GAME_OBJECT_VALUE);
-
-    player.playerHand = [
-      twentyone.createCard('2', twentyone.SUITS[0]),
-      twentyone.createCard('3', twentyone.SUITS[0]),
-      twentyone.createCard('jack', twentyone.SUITS[0]),
-    ];
-    expect(twentyone.getNonBustedHandTotals(player.playerHand).at(0))
-      .toBe(15);
-  });
-
   it('max hand total is <= GAME_OBJECT_VALUE', () => {
     player.playerHand = [
       twentyone.createCard('jack', twentyone.SUITS[0]),

@@ -255,14 +255,8 @@ function getHandTotal(playerHand) {
   return totals[0];
 }
 
-function getNonBustedHandTotals(playerHand) {
-  return getHandTotals(playerHand).filter(
-    (total) => total <= GAME_OBJECT_VALUE
-  );
-}
-
 function isBusted(playerHand) {
-  return getNonBustedHandTotals(playerHand).length === 0;
+  return getHandTotal(playerHand) > GAME_OBJECT_VALUE;
 }
 
 // eslint-disable-next-line max-lines-per-function
@@ -348,6 +342,5 @@ module.exports = {
   getHandCardValues,
   getHandTotals,
   getHandTotal,
-  getNonBustedHandTotals,
   isBusted,
 };
