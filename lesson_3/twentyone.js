@@ -135,6 +135,7 @@ function getPlayerHandString(playerInfo, secondFaceDown = false) {
 
   secondFaceDown = cards.length === 2 && secondFaceDown;
   if (secondFaceDown) cards[1] = 'unknown card';
+  cards = joinOr(cards, ', ', 'and');
 
   return (
     `${playerInfo.name} has: ${cards} ` +
