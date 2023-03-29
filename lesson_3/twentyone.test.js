@@ -418,8 +418,8 @@ describe('doing the dealer turn', () => {
         twentyone.createCard('10', twentyone.SUITS[0]),
         twentyone.createCard('2', twentyone.SUITS[0]),
       ];
-      expect(twentyone.doDealerTurn(deck, player, dealer))
-        .toBe(twentyone.DEALER_STAY_VALUE);
+      twentyone.doDealerTurn(deck, player, dealer);
+      expect(dealer.handTotal).toBe(twentyone.DEALER_STAY_VALUE);
 
       dealer.playerHand = [
         twentyone.createCard('jack', twentyone.SUITS[0]),
@@ -429,8 +429,8 @@ describe('doing the dealer turn', () => {
         twentyone.createCard('2', twentyone.SUITS[0]),
         twentyone.createCard('10', twentyone.SUITS[0]),
       ];
-      expect(twentyone.doDealerTurn(deck, player, dealer))
-        .toBe(twentyone.DEALER_STAY_VALUE);
+      twentyone.doDealerTurn(deck, player, dealer);
+      expect(dealer.handTotal).toBe(twentyone.DEALER_STAY_VALUE);
 
     });
 
@@ -443,8 +443,8 @@ describe('doing the dealer turn', () => {
         twentyone.createCard('2', twentyone.SUITS[0]),
         twentyone.createCard('10', twentyone.SUITS[0]),
       ];
-      expect(twentyone.doDealerTurn(deck, player, dealer))
-        .toBeGreaterThan(twentyone.DEALER_STAY_VALUE);
+      twentyone.doDealerTurn(deck, player, dealer);
+      expect(dealer.handTotal).toBeGreaterThan(twentyone.DEALER_STAY_VALUE);
 
       dealer.playerHand = [
         twentyone.createCard('7', twentyone.SUITS[0]),
@@ -454,8 +454,8 @@ describe('doing the dealer turn', () => {
         twentyone.createCard('6', twentyone.SUITS[0]),
         twentyone.createCard('2', twentyone.SUITS[0]),
       ];
-      expect(twentyone.doDealerTurn(deck, player, dealer))
-        .toBeGreaterThan(twentyone.DEALER_STAY_VALUE);
+      twentyone.doDealerTurn(deck, player, dealer);
+      expect(dealer.handTotal).toBeGreaterThan(twentyone.DEALER_STAY_VALUE);
     });
 
     it('should stay when hand total > DEALER_STAY_VALUE', () => {
@@ -466,8 +466,8 @@ describe('doing the dealer turn', () => {
       deck = [
         twentyone.createCard('10', twentyone.SUITS[0]),
       ];
-      expect(twentyone.doDealerTurn(deck, player, dealer))
-        .toBeGreaterThan(twentyone.DEALER_STAY_VALUE);
+      twentyone.doDealerTurn(deck, player, dealer);
+      expect(dealer.handTotal).toBeGreaterThan(twentyone.DEALER_STAY_VALUE);
     });
   });
 
@@ -480,7 +480,7 @@ describe('doing the dealer turn', () => {
       twentyone.createCard('6', twentyone.SUITS[0]),
       twentyone.createCard('6', twentyone.SUITS[0]),
     ];
-    expect(twentyone.doDealerTurn(deck, player, dealer))
-      .toBeGreaterThan(twentyone.GAME_OBJECT_VALUE);
+    twentyone.doDealerTurn(deck, player, dealer);
+    expect(dealer.handTotal).toBeGreaterThan(twentyone.GAME_OBJECT_VALUE);
   });
 });

@@ -149,13 +149,12 @@ function doPlayerTurn(deck, playerInfo, dealerInfo) {
     let choice = promptWithChoices('Your choice?', ['hit', 'stay']);
 
     if (choice === 'stay') {
-      return playerInfo.handTotal;
+      return;
     }
     dealCard(deck, playerInfo);
   }
 
   displayPlayerHands(playerInfo, dealerInfo, dealerFaceDown);
-  return playerInfo.handTotal;
 }
 
 function shouldDealerHit(dealerInfo) {
@@ -181,14 +180,13 @@ function doDealerTurn(deck, playerInfo, dealerInfo) {
     displayPlayerHands(playerInfo, dealerInfo, dealerFaceDown);
 
     if (!shouldDealerHit(dealerInfo)) {
-      return dealerInfo.handTotal;
+      return;
     }
     sleep(dealerTurnSleepDuration);
     dealCard(deck, dealerInfo);
   }
 
   displayPlayerHands(playerInfo, dealerInfo, dealerFaceDown);
-  return dealerInfo.handTotal;
 }
 
 function dealCard(deck, player) {
@@ -270,7 +268,7 @@ function playTwentyOne(playerInfo, dealerInfo) {
   let players = [playerInfo, dealerInfo];
 
   for (let curPlayer of players) {
-    curPlayer.handTotal = curPlayer.doTurnCallback(deck, ...players);
+    curPlayer.doTurnCallback(deck, ...players);
     if (isBusted(curPlayer.handTotal)) {
       displayOutput(`${curPlayer.name} busts.`);
       return;
