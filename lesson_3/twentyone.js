@@ -221,16 +221,6 @@ function createPlayer(name, playerType) {
   };
 }
 
-// TODO: remove?
-function getHandMinTotal(playerHand) {
-  return getHandTotals(playerHand).at(0);
-}
-
-// TODO: remove?
-function getHandMaxTotal(playerHand) {
-  return getHandTotals(playerHand).at(-1);
-}
-
 function getMaxNonBustedHandTotal(playerHand) {
   let totals = getNonBustedHandTotals(playerHand);
   if (totals.length > 0) return totals.at(-1);
@@ -354,8 +344,6 @@ module.exports = {
   dealCard,
   dealInitialHands,
   createPlayer,
-  getHandMinTotal,
-  getHandMaxTotal,
   getMaxNonBustedHandTotal,
   getHandCardValues,
   getHandTotals,

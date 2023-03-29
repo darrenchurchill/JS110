@@ -301,11 +301,6 @@ describe('calculating player hands', () => {
         });
       });
 
-      it('min hand value === max hand value', () => {
-        expect(twentyone.getHandMinTotal(player.playerHand))
-          .toBe(twentyone.getHandMaxTotal(player.playerHand));
-      });
-
       it('there is only one possible total hand value', () => {
         expect(twentyone.getHandTotals(player.playerHand)).toHaveLength(1);
       });
@@ -408,16 +403,6 @@ describe('calculating player hands', () => {
         expect(twentyone.getHandTotals(player.playerHand)).toEqual([15, 25]);
         expect(twentyone.getHandTotal(player.playerHand)).toBe(15);
       });
-    });
-
-    it('max hand value === final value in hand total values', () => {
-      for (let suit of twentyone.SUITS) {
-        player.playerHand.push(
-          twentyone.createCard(twentyone.FACE_CARDS_SPECIAL[0], suit)
-        );
-      }
-      expect(twentyone.getHandMaxTotal(player.playerHand))
-        .toBe(twentyone.getHandTotals(player.playerHand).at(-1));
     });
   });
 });
