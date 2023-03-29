@@ -270,6 +270,9 @@ function playTwentyOne(playerInfo, dealerInfo) {
   let deck = createDeck();
   shuffle(deck);
 
+  playerInfo.playerHand = [];
+  dealerInfo.playerHand = [];
+
   dealInitialHands(deck, playerInfo, dealerInfo);
   let players = [playerInfo, dealerInfo];
 
@@ -290,11 +293,25 @@ function playTwentyOne(playerInfo, dealerInfo) {
   }
 }
 
-if (require.main === module) {
+function shouldPlayAgain() {
+  let choices = ['no', 'yes'];
+  let choice = promptWithChoices('Play again?', choices);
+  return choice === choices[1];
+}
+
+function playUntilDone() {
   let player = createPlayer('player', PLAYER_TYPE_PLAYER);
   let dealer = createPlayer('dealer', PLAYER_TYPE_DEALER);
 
-  playTwentyOne(player, dealer);
+  while (true) {
+    playTwentyOne(player, dealer);
+
+    if (!shouldPlayAgain()) return;
+  }
+}
+
+if (require.main === module) {
+  playUntilDone();
 }
 
 module.exports = {
