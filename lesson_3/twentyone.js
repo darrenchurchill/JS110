@@ -129,7 +129,9 @@ function displayPlayerHands(playerInfo, dealerInfo, dealerFaceDown = true) {
 
 function getPlayerHandString(playerInfo, secondFaceDown = false) {
   let total = getHandTotal(playerInfo.playerHand);
-  let cards = playerInfo.playerHand.map((card) => card.name);
+  let cards = playerInfo.playerHand.map(
+    (card) => card.name[0].toUpperCase() + card.name.slice(1)
+  );
 
   secondFaceDown = cards.length === 2 && secondFaceDown;
   if (secondFaceDown) cards[1] = 'unknown card';
