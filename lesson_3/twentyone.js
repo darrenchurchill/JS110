@@ -127,7 +127,6 @@ function displayPlayerHands(playerInfo, dealerInfo, dealerFaceDown = true) {
 }
 
 function getPlayerHandString(playerInfo, secondFaceDown = false) {
-  let total = getHandTotal(playerInfo.playerHand);
   let cards = playerInfo.playerHand.map(
     (card) => card.name[0].toUpperCase() + card.name.slice(1)
   );
@@ -138,29 +137,29 @@ function getPlayerHandString(playerInfo, secondFaceDown = false) {
 
   return (
     `${playerInfo.name} has: ${cards} ` +
-    `${secondFaceDown ? '' : `(total: ${total})`}`
+    `${secondFaceDown ? '' : `(total: ${playerInfo.handTotal})`}`
   );
 }
 
 function doPlayerTurn(deck, playerInfo, dealerInfo) {
   let dealerFaceDown = true;
 
-  while (!isBusted(playerInfo.playerHand)) {
+  while (!isBusted(playerInfo.handTotal)) {
     displayPlayerHands(playerInfo, dealerInfo, dealerFaceDown);
     let choice = promptWithChoices('Your choice?', ['hit', 'stay']);
 
     if (choice === 'stay') {
-      return getHandTotal(playerInfo.playerHand);
+      return playerInfo.handTotal;
     }
     dealCard(deck, playerInfo);
   }
 
   displayPlayerHands(playerInfo, dealerInfo, dealerFaceDown);
-  return getHandTotal(playerInfo.playerHand);
+  return playerInfo.handTotal;
 }
 
 function shouldDealerHit(dealerInfo) {
-  return getHandTotal(dealerInfo.playerHand) < DEALER_STAY_VALUE;
+  return dealerInfo.handTotal < DEALER_STAY_VALUE;
 }
 
 function setDealerTurnSleepDuration(ms) {
@@ -178,22 +177,23 @@ function sleep(ms) {
 function doDealerTurn(deck, playerInfo, dealerInfo) {
   let dealerFaceDown = false;
 
-  while (!isBusted(dealerInfo.playerHand)) {
+  while (!isBusted(dealerInfo.handTotal)) {
     displayPlayerHands(playerInfo, dealerInfo, dealerFaceDown);
 
     if (!shouldDealerHit(dealerInfo)) {
-      return getHandTotal(dealerInfo.playerHand);
+      return dealerInfo.handTotal;
     }
     sleep(dealerTurnSleepDuration);
     dealCard(deck, dealerInfo);
   }
 
   displayPlayerHands(playerInfo, dealerInfo, dealerFaceDown);
-  return getHandTotal(dealerInfo.playerHand);
+  return dealerInfo.handTotal;
 }
 
 function dealCard(deck, player) {
   player.playerHand.push(deck.shift());
+  player.handTotal = getHandTotal(player.playerHand);
 }
 
 function dealInitialHands(deck, player, dealer) {
@@ -215,6 +215,7 @@ function createPlayer(name, playerType) {
     name: name,
     playerType: playerType,
     playerHand: [],
+    handTotal: 0,
     doTurnCallback:
       playerType === PLAYER_TYPE_PLAYER ? doPlayerTurn : doDealerTurn,
   };
@@ -248,11 +249,13 @@ function getHandTotal(playerHand) {
   return totals[0];
 }
 
-function isBusted(playerHand) {
-  if (Array.isArray(playerHand)) {
-    return getHandTotal(playerHand) > GAME_OBJECT_VALUE;
+function isBusted(playerHandOrHandTotal) {
+  if (Array.isArray(playerHandOrHandTotal)) {
+    return getHandTotal(playerHandOrHandTotal) > GAME_OBJECT_VALUE;
+  } else if (typeof player === 'object') {
+    return playerHandOrHandTotal.handTotal > GAME_OBJECT_VALUE;
   }
-  return playerHand > GAME_OBJECT_VALUE;
+  return playerHandOrHandTotal > GAME_OBJECT_VALUE;
 }
 
 // eslint-disable-next-line max-lines-per-function
