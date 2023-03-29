@@ -28,6 +28,26 @@ beforeEach(() => {
   );
 });
 
+describe('joinOr array to string', () => {
+  it('should not return an empty string when array is empty', () => {
+    expect(twentyone.joinOr([])).toBe('');
+  });
+
+  it('should not include the delimiter for two or fewer values', () => {
+    expect(twentyone.joinOr([1])).toBe('1');
+    expect(twentyone.joinOr([1], '; ')).toBe('1');
+    expect(twentyone.joinOr([1, 2])).toBe('1 or 2');
+    expect(twentyone.joinOr([1, 2], '; ')).toBe('1 or 2');
+    expect(twentyone.joinOr([1, 2], '; ', 'and')).toBe('1 and 2');
+  });
+
+  it('should include the delimiter for three or more values', () => {
+    expect(twentyone.joinOr([1, 2, 3])).toBe('1, 2, or 3');
+    expect(twentyone.joinOr([1, 2, 3], '; ')).toBe('1; 2; or 3');
+    expect(twentyone.joinOr([1, 2, 3], '; ', 'and')).toBe('1; 2; and 3');
+  });
+});
+
 describe('test getting an unambiguous choice from a list of choices', () => {
   let choices;
 

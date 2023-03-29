@@ -72,6 +72,15 @@ function displayOutput(output) {
   console.log(output);
 }
 
+function joinOr(array, delimiter = ', ', lastWord = 'or') {
+  if (array.length <= 1) return `${array.join(delimiter)}`;
+
+  let firstSlice = array.slice(0, array.length - 1).join(delimiter);
+  if (!lastWord || array.length === 2) delimiter = ' ';
+  let lastElem = array[array.length - 1];
+
+  return `${firstSlice}${delimiter}${lastWord ? `${lastWord} ` : ''}${lastElem}`;
+}
 
 function createCard(name, suit) {
   let value = Number(name);
@@ -332,6 +341,7 @@ module.exports = {
   promptWithChoices,
   getUnambiguousChoice,
   displayOutput,
+  joinOr,
   createCard,
   createSuit,
   createDeck,
