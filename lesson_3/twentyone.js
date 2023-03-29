@@ -222,8 +222,8 @@ function createPlayer(name, playerType) {
 }
 
 function getMaxNonBustedHandTotal(playerHand) {
-  let totals = getNonBustedHandTotals(playerHand);
-  if (totals.length > 0) return totals.at(-1);
+  let total = getHandTotal(playerHand);
+  if (total <= GAME_OBJECT_VALUE) return total;
   return GAME_RESULT_PLAYER_BUST;
 }
 
