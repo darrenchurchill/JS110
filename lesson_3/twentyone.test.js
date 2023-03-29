@@ -407,48 +407,6 @@ describe('calculating player hands', () => {
   });
 });
 
-describe('calculating non-busting hand values', () => {
-  beforeEach(() => {
-    player.playerHand = [
-      twentyone.createCard(twentyone.NUMBER_CARDS[0], twentyone.SUITS[0]),
-      twentyone.createCard(twentyone.NUMBER_CARDS[1], twentyone.SUITS[0]),
-    ];
-  });
-
-  it('max hand total is <= GAME_OBJECT_VALUE', () => {
-    player.playerHand = [
-      twentyone.createCard('jack', twentyone.SUITS[0]),
-      twentyone.createCard('ace', twentyone.SUITS[0]),
-    ];
-    expect(twentyone.getMaxNonBustedHandTotal(player.playerHand))
-      .toBeLessThanOrEqual(twentyone.GAME_OBJECT_VALUE);
-
-    player.playerHand.push(
-      twentyone.createCard('queen', twentyone.SUITS[0]),
-    );
-    expect(twentyone.getMaxNonBustedHandTotal(player.playerHand))
-      .toBeLessThanOrEqual(twentyone.GAME_OBJECT_VALUE);
-
-    player.playerHand = [
-      twentyone.createCard('2', twentyone.SUITS[0]),
-      twentyone.createCard('3', twentyone.SUITS[0]),
-      twentyone.createCard('jack', twentyone.SUITS[0]),
-    ];
-    expect(twentyone.getMaxNonBustedHandTotal(player.playerHand))
-      .toBeLessThanOrEqual(twentyone.GAME_OBJECT_VALUE);
-  });
-
-  it('busted hand total === GAME_RESULT_PLAYER_BUST', () => {
-    player.playerHand = [
-      twentyone.createCard('jack', twentyone.SUITS[0]),
-      twentyone.createCard('queen', twentyone.SUITS[0]),
-      twentyone.createCard('2', twentyone.SUITS[0]),
-    ];
-    expect(twentyone.getMaxNonBustedHandTotal(player.playerHand))
-      .toBe(twentyone.GAME_RESULT_PLAYER_BUST);
-  });
-});
-
 describe('doing the dealer turn', () => {
   describe('should hit until hand total >= DEALER_STAY_VALUE', () => {
     it('should stay at hand total === DEALER_STAY_VALUE', () => {
@@ -513,7 +471,7 @@ describe('doing the dealer turn', () => {
     });
   });
 
-  it('dealer bust returns GAME_RESULT_PLAYER_BUST', () => {
+  it('dealer bust returns value > GAME_OBJECT_VALUE', () => {
     dealer.playerHand = [
       twentyone.createCard('7', twentyone.SUITS[0]),
       twentyone.createCard('3', twentyone.SUITS[0]),
@@ -523,6 +481,6 @@ describe('doing the dealer turn', () => {
       twentyone.createCard('6', twentyone.SUITS[0]),
     ];
     expect(twentyone.doDealerTurn(deck, player, dealer))
-      .toBe(twentyone.GAME_RESULT_PLAYER_BUST);
+      .toBeGreaterThan(twentyone.GAME_OBJECT_VALUE);
   });
 });

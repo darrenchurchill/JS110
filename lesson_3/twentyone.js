@@ -23,7 +23,6 @@ const PLAYER_TYPE_DEALER = 1;
 const INITIAL_HAND_SIZE = 2;
 const DEALER_STAY_VALUE = 17;
 const GAME_OBJECT_VALUE = 21;
-const GAME_RESULT_PLAYER_BUST = -1;
 
 let dealerTurnSleepDuration = 1000;  // milliseconds
 
@@ -151,17 +150,17 @@ function doPlayerTurn(deck, playerInfo, dealerInfo) {
     let choice = promptWithChoices('Your choice?', ['hit', 'stay']);
 
     if (choice === 'stay') {
-      return getMaxNonBustedHandTotal(playerInfo.playerHand);
+      return getHandTotal(playerInfo.playerHand);
     }
     dealCard(deck, playerInfo);
   }
 
   displayPlayerHands(playerInfo, dealerInfo, dealerFaceDown);
-  return GAME_RESULT_PLAYER_BUST;
+  return getHandTotal(playerInfo.playerHand);
 }
 
 function shouldDealerHit(dealerInfo) {
-  return getMaxNonBustedHandTotal(dealerInfo.playerHand) < DEALER_STAY_VALUE;
+  return getHandTotal(dealerInfo.playerHand) < DEALER_STAY_VALUE;
 }
 
 function setDealerTurnSleepDuration(ms) {
@@ -183,14 +182,14 @@ function doDealerTurn(deck, playerInfo, dealerInfo) {
     displayPlayerHands(playerInfo, dealerInfo, dealerFaceDown);
 
     if (!shouldDealerHit(dealerInfo)) {
-      return getMaxNonBustedHandTotal(dealerInfo.playerHand);
+      return getHandTotal(dealerInfo.playerHand);
     }
     sleep(dealerTurnSleepDuration);
     dealCard(deck, dealerInfo);
   }
 
   displayPlayerHands(playerInfo, dealerInfo, dealerFaceDown);
-  return GAME_RESULT_PLAYER_BUST;
+  return getHandTotal(dealerInfo.playerHand);
 }
 
 function dealCard(deck, player) {
@@ -219,12 +218,6 @@ function createPlayer(name, playerType) {
     doTurnCallback:
       playerType === PLAYER_TYPE_PLAYER ? doPlayerTurn : doDealerTurn,
   };
-}
-
-function getMaxNonBustedHandTotal(playerHand) {
-  let total = getHandTotal(playerHand);
-  if (total <= GAME_OBJECT_VALUE) return total;
-  return GAME_RESULT_PLAYER_BUST;
 }
 
 function getHandCardValues(playerHand) {
@@ -256,7 +249,10 @@ function getHandTotal(playerHand) {
 }
 
 function isBusted(playerHand) {
-  return getHandTotal(playerHand) > GAME_OBJECT_VALUE;
+  if (Array.isArray(playerHand)) {
+    return getHandTotal(playerHand) > GAME_OBJECT_VALUE;
+  }
+  return playerHand > GAME_OBJECT_VALUE;
 }
 
 // eslint-disable-next-line max-lines-per-function
@@ -272,7 +268,7 @@ function playTwentyOne(playerInfo, dealerInfo) {
 
   for (let curPlayer of players) {
     curPlayer.handTotal = curPlayer.doTurnCallback(deck, ...players);
-    if (curPlayer.handTotal === GAME_RESULT_PLAYER_BUST) {
+    if (isBusted(curPlayer.handTotal)) {
       displayOutput(`${curPlayer.name} busts.`);
       return;
     }
@@ -321,7 +317,6 @@ module.exports = {
   INITIAL_HAND_SIZE,
   DEALER_STAY_VALUE,
   GAME_OBJECT_VALUE,
-  GAME_RESULT_PLAYER_BUST,
   prompt,
   promptWithChoices,
   getUnambiguousChoice,
@@ -338,7 +333,6 @@ module.exports = {
   dealCard,
   dealInitialHands,
   createPlayer,
-  getMaxNonBustedHandTotal,
   getHandCardValues,
   getHandTotals,
   getHandTotal,
