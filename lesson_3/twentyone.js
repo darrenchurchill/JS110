@@ -304,9 +304,9 @@ function playTwentyOne(playerInfo, dealerInfo) {
 }
 
 function shouldPlayAgain() {
-  let choices = ['no', 'yes'];
+  let choices = ['yes', 'no'];
   let choice = promptWithChoices('Play again?', choices);
-  return choice === choices[1];
+  return choice === choices[0];
 }
 
 function playUntilDone() {
