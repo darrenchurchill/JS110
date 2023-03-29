@@ -310,8 +310,8 @@ function shouldPlayAgain() {
 }
 
 function playUntilDone() {
-  let player = createPlayer('player', PLAYER_TYPE_PLAYER);
-  let dealer = createPlayer('dealer', PLAYER_TYPE_DEALER);
+  let player = createPlayer('Player', PLAYER_TYPE_PLAYER);
+  let dealer = createPlayer('Dealer', PLAYER_TYPE_DEALER);
 
   while (true) {
     playTwentyOne(player, dealer);
